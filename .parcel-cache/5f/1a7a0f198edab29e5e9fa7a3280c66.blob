@@ -1,0 +1,12 @@
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "assert", function () {
+  return assert;
+});
+var _AssertionErrorJs = require('./AssertionError.js');
+var _AssertionErrorJsDefault = _parcelHelpers.interopDefault(_AssertionErrorJs);
+function assert(assertion, errorCode) {
+  if (!assertion) {
+    throw new _AssertionErrorJsDefault.default(errorCode);
+  }
+}

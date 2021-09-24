@@ -1,0 +1,27 @@
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "clear", function () {
+  return clear;
+});
+_parcelHelpers.export(exports, "get", function () {
+  return get;
+});
+_parcelHelpers.export(exports, "add", function () {
+  return add;
+});
+/**
+* @module ol/proj/projections
+*/
+/**
+* @type {Object<string, import("./Projection.js").default>}
+*/
+var cache = {};
+function clear() {
+  cache = {};
+}
+function get(code) {
+  return cache[code] || cache[code.replace(/urn:(x-)?ogc:def:crs:EPSG:(.*:)?(\w+)$/, 'EPSG:$3')] || null;
+}
+function add(code, projection) {
+  cache[code] = projection;
+}

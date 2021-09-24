@@ -1,0 +1,50 @@
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "FIREFOX", function () {
+  return FIREFOX;
+});
+_parcelHelpers.export(exports, "SAFARI", function () {
+  return SAFARI;
+});
+_parcelHelpers.export(exports, "WEBKIT", function () {
+  return WEBKIT;
+});
+_parcelHelpers.export(exports, "MAC", function () {
+  return MAC;
+});
+_parcelHelpers.export(exports, "DEVICE_PIXEL_RATIO", function () {
+  return DEVICE_PIXEL_RATIO;
+});
+_parcelHelpers.export(exports, "WORKER_OFFSCREEN_CANVAS", function () {
+  return WORKER_OFFSCREEN_CANVAS;
+});
+_parcelHelpers.export(exports, "IMAGE_DECODE", function () {
+  return IMAGE_DECODE;
+});
+_parcelHelpers.export(exports, "PASSIVE_EVENT_LISTENERS", function () {
+  return PASSIVE_EVENT_LISTENERS;
+});
+/**
+* @module ol/has
+*/
+var ua = typeof navigator !== 'undefined' && typeof navigator.userAgent !== 'undefined' ? navigator.userAgent.toLowerCase() : '';
+var FIREFOX = ua.indexOf('firefox') !== -1;
+var SAFARI = ua.indexOf('safari') !== -1 && ua.indexOf('chrom') == -1;
+var WEBKIT = ua.indexOf('webkit') !== -1 && ua.indexOf('edge') == -1;
+var MAC = ua.indexOf('macintosh') !== -1;
+var DEVICE_PIXEL_RATIO = typeof devicePixelRatio !== 'undefined' ? devicePixelRatio : 1;
+var WORKER_OFFSCREEN_CANVAS = typeof WorkerGlobalScope !== 'undefined' && typeof OffscreenCanvas !== 'undefined' && self instanceof WorkerGlobalScope;
+var IMAGE_DECODE = typeof Image !== 'undefined' && Image.prototype.decode;
+var PASSIVE_EVENT_LISTENERS = (function () {
+  var passive = false;
+  try {
+    var options = Object.defineProperty({}, 'passive', {
+      get: function () {
+        passive = true;
+      }
+    });
+    window.addEventListener('_', null, options);
+    window.removeEventListener('_', null, options);
+  } catch (error) {}
+  return passive;
+})();

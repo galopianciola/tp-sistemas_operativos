@@ -1,0 +1,42 @@
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "linearRing", function () {
+  return linearRing;
+});
+_parcelHelpers.export(exports, "linearRings", function () {
+  return linearRings;
+});
+_parcelHelpers.export(exports, "linearRingss", function () {
+  return linearRingss;
+});
+function linearRing(flatCoordinates, offset, end, stride) {
+  var twiceArea = 0;
+  var x1 = flatCoordinates[end - stride];
+  var y1 = flatCoordinates[end - stride + 1];
+  for (; offset < end; offset += stride) {
+    var x2 = flatCoordinates[offset];
+    var y2 = flatCoordinates[offset + 1];
+    twiceArea += y1 * x2 - x1 * y2;
+    x1 = x2;
+    y1 = y2;
+  }
+  return twiceArea / 2;
+}
+function linearRings(flatCoordinates, offset, ends, stride) {
+  var area = 0;
+  for (var i = 0, ii = ends.length; i < ii; ++i) {
+    var end = ends[i];
+    area += linearRing(flatCoordinates, offset, end, stride);
+    offset = end;
+  }
+  return area;
+}
+function linearRingss(flatCoordinates, offset, endss, stride) {
+  var area = 0;
+  for (var i = 0, ii = endss.length; i < ii; ++i) {
+    var ends = endss[i];
+    area += linearRings(flatCoordinates, offset, ends, stride);
+    offset = ends[ends.length - 1];
+  }
+  return area;
+}

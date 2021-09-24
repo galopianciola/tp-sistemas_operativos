@@ -1,0 +1,98 @@
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "loadFeaturesXhr", function () {
+  return loadFeaturesXhr;
+});
+_parcelHelpers.export(exports, "xhr", function () {
+  return xhr;
+});
+_parcelHelpers.export(exports, "setWithCredentials", function () {
+  return setWithCredentials;
+});
+var _formatFormatTypeJs = require('./format/FormatType.js');
+var _formatFormatTypeJsDefault = _parcelHelpers.interopDefault(_formatFormatTypeJs);
+var _functionsJs = require('./functions.js');
+/**
+*
+* @type {boolean}
+* @private
+*/
+var withCredentials = false;
+function loadFeaturesXhr(url, format, extent, resolution, projection, success, failure) {
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', typeof url === 'function' ? url(extent, resolution, projection) : url, true);
+  if (format.getType() == _formatFormatTypeJsDefault.default.ARRAY_BUFFER) {
+    xhr.responseType = 'arraybuffer';
+  }
+  xhr.withCredentials = withCredentials;
+  /**
+  * @param {Event} event Event.
+  * @private
+  */
+  xhr.onload = function (event) {
+    // status will be 0 for file:// urls
+    if (!xhr.status || xhr.status >= 200 && xhr.status < 300) {
+      var type = format.getType();
+      /** @type {Document|Node|Object|string|undefined}*/
+      var source = void 0;
+      if (type == _formatFormatTypeJsDefault.default.JSON || type == _formatFormatTypeJsDefault.default.TEXT) {
+        source = xhr.responseText;
+      } else if (type == _formatFormatTypeJsDefault.default.XML) {
+        source = xhr.responseXML;
+        if (!source) {
+          source = new DOMParser().parseFromString(xhr.responseText, 'application/xml');
+        }
+      } else if (type == _formatFormatTypeJsDefault.default.ARRAY_BUFFER) {
+        source = /** @type {ArrayBuffer}*/
+        xhr.response;
+      }
+      if (source) {
+        success(/** @type {Array<import("./Feature.js").default>}*/
+        format.readFeatures(source, {
+          extent: extent,
+          featureProjection: projection
+        }), format.readProjection(source));
+      } else {
+        failure();
+      }
+    } else {
+      failure();
+    }
+  };
+  /**
+  * @private
+  */
+  xhr.onerror = failure;
+  xhr.send();
+}
+function xhr(url, format) {
+  /**
+  * @param {import("./extent.js").Extent} extent Extent.
+  * @param {number} resolution Resolution.
+  * @param {import("./proj/Projection.js").default} projection Projection.
+  * @param {function(): void=} success Success
+  *      Function called when loading succeeded.
+  * @param {function(): void=} failure Failure
+  *      Function called when loading failed.
+  * @this {import("./source/Vector").default}
+  */
+  return function (extent, resolution, projection, success, failure) {
+    var source = /** @type {import("./source/Vector").default}*/
+    this;
+    loadFeaturesXhr(url, format, extent, resolution, projection, /**
+    * @param {Array<import("./Feature.js").default>} features The loaded features.
+    * @param {import("./proj/Projection.js").default} dataProjection Data
+    * projection.
+    */
+    function (features, dataProjection) {
+      if (success !== undefined) {
+        success(features);
+      }
+      source.addFeatures(features);
+    }, /*FIXME handle error*/
+    failure ? failure : _functionsJs.VOID);
+  };
+}
+function setWithCredentials(xhrWithCredentials) {
+  withCredentials = xhrWithCredentials;
+}

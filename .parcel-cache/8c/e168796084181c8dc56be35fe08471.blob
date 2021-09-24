@@ -1,0 +1,40 @@
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "all", function () {
+  return all;
+});
+_parcelHelpers.export(exports, "bbox", function () {
+  return bbox;
+});
+_parcelHelpers.export(exports, "tile", function () {
+  return tile;
+});
+function all(extent, resolution) {
+  return [[-Infinity, -Infinity, Infinity, Infinity]];
+}
+function bbox(extent, resolution) {
+  return [extent];
+}
+function tile(tileGrid) {
+  return (
+    /**
+    * @param {import("./extent.js").Extent} extent Extent.
+    * @param {number} resolution Resolution.
+    * @return {Array<import("./extent.js").Extent>} Extents.
+    */
+    function (extent, resolution) {
+      var z = tileGrid.getZForResolution(resolution);
+      var tileRange = tileGrid.getTileRangeForExtentAndZ(extent, z);
+      /** @type {Array<import("./extent.js").Extent>}*/
+      var extents = [];
+      /** @type {import("./tilecoord.js").TileCoord}*/
+      var tileCoord = [z, 0, 0];
+      for (tileCoord[1] = tileRange.minX; tileCoord[1] <= tileRange.maxX; ++tileCoord[1]) {
+        for (tileCoord[2] = tileRange.minY; tileCoord[2] <= tileRange.maxY; ++tileCoord[2]) {
+          extents.push(tileGrid.getTileCoordExtent(tileCoord));
+        }
+      }
+      return extents;
+    }
+  );
+}

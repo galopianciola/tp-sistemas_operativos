@@ -1,0 +1,82 @@
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "linearRingIsClockwise", function () {
+  return linearRingIsClockwise;
+});
+_parcelHelpers.export(exports, "linearRingsAreOriented", function () {
+  return linearRingsAreOriented;
+});
+_parcelHelpers.export(exports, "linearRingssAreOriented", function () {
+  return linearRingssAreOriented;
+});
+_parcelHelpers.export(exports, "orientLinearRings", function () {
+  return orientLinearRings;
+});
+_parcelHelpers.export(exports, "orientLinearRingsArray", function () {
+  return orientLinearRingsArray;
+});
+var _reverseJs = require('./reverse.js');
+function linearRingIsClockwise(flatCoordinates, offset, end, stride) {
+  // http://tinyurl.com/clockwise-method
+  // https://github.com/OSGeo/gdal/blob/trunk/gdal/ogr/ogrlinearring.cpp
+  var edge = 0;
+  var x1 = flatCoordinates[end - stride];
+  var y1 = flatCoordinates[end - stride + 1];
+  for (; offset < end; offset += stride) {
+    var x2 = flatCoordinates[offset];
+    var y2 = flatCoordinates[offset + 1];
+    edge += (x2 - x1) * (y2 + y1);
+    x1 = x2;
+    y1 = y2;
+  }
+  return edge === 0 ? undefined : edge > 0;
+}
+function linearRingsAreOriented(flatCoordinates, offset, ends, stride, opt_right) {
+  var right = opt_right !== undefined ? opt_right : false;
+  for (var i = 0, ii = ends.length; i < ii; ++i) {
+    var end = ends[i];
+    var isClockwise = linearRingIsClockwise(flatCoordinates, offset, end, stride);
+    if (i === 0) {
+      if (right && isClockwise || !right && !isClockwise) {
+        return false;
+      }
+    } else {
+      if (right && !isClockwise || !right && isClockwise) {
+        return false;
+      }
+    }
+    offset = end;
+  }
+  return true;
+}
+function linearRingssAreOriented(flatCoordinates, offset, endss, stride, opt_right) {
+  for (var i = 0, ii = endss.length; i < ii; ++i) {
+    var ends = endss[i];
+    if (!linearRingsAreOriented(flatCoordinates, offset, ends, stride, opt_right)) {
+      return false;
+    }
+    if (ends.length) {
+      offset = ends[ends.length - 1];
+    }
+  }
+  return true;
+}
+function orientLinearRings(flatCoordinates, offset, ends, stride, opt_right) {
+  var right = opt_right !== undefined ? opt_right : false;
+  for (var i = 0, ii = ends.length; i < ii; ++i) {
+    var end = ends[i];
+    var isClockwise = linearRingIsClockwise(flatCoordinates, offset, end, stride);
+    var reverse = i === 0 ? right && isClockwise || !right && !isClockwise : right && !isClockwise || !right && isClockwise;
+    if (reverse) {
+      _reverseJs.coordinates(flatCoordinates, offset, end, stride);
+    }
+    offset = end;
+  }
+  return offset;
+}
+function orientLinearRingsArray(flatCoordinates, offset, endss, stride, opt_right) {
+  for (var i = 0, ii = endss.length; i < ii; ++i) {
+    offset = orientLinearRings(flatCoordinates, offset, endss[i], stride, opt_right);
+  }
+  return offset;
+}

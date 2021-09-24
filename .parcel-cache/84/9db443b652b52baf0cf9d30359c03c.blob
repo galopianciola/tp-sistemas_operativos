@@ -1,0 +1,200 @@
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "DEFAULT_RADIUS", function () {
+  return DEFAULT_RADIUS;
+});
+_parcelHelpers.export(exports, "getDistance", function () {
+  return getDistance;
+});
+_parcelHelpers.export(exports, "getLength", function () {
+  return getLength;
+});
+_parcelHelpers.export(exports, "getArea", function () {
+  return getArea;
+});
+_parcelHelpers.export(exports, "offset", function () {
+  return offset;
+});
+var _geomGeometryTypeJs = require('./geom/GeometryType.js');
+var _geomGeometryTypeJsDefault = _parcelHelpers.interopDefault(_geomGeometryTypeJs);
+var _mathJs = require('./math.js');
+var DEFAULT_RADIUS = 6371008.8;
+function getDistance(c1, c2, opt_radius) {
+  var radius = opt_radius || DEFAULT_RADIUS;
+  var lat1 = _mathJs.toRadians(c1[1]);
+  var lat2 = _mathJs.toRadians(c2[1]);
+  var deltaLatBy2 = (lat2 - lat1) / 2;
+  var deltaLonBy2 = _mathJs.toRadians(c2[0] - c1[0]) / 2;
+  var a = Math.sin(deltaLatBy2) * Math.sin(deltaLatBy2) + Math.sin(deltaLonBy2) * Math.sin(deltaLonBy2) * Math.cos(lat1) * Math.cos(lat2);
+  return 2 * radius * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+/**
+* Get the cumulative great circle length of linestring coordinates (geographic).
+* @param {Array} coordinates Linestring coordinates.
+* @param {number} radius The sphere radius to use.
+* @return {number} The length (in meters).
+*/
+function getLengthInternal(coordinates, radius) {
+  var length = 0;
+  for (var i = 0, ii = coordinates.length; i < ii - 1; ++i) {
+    length += getDistance(coordinates[i], coordinates[i + 1], radius);
+  }
+  return length;
+}
+function getLength(geometry, opt_options) {
+  var options = opt_options || ({});
+  var radius = options.radius || DEFAULT_RADIUS;
+  var projection = options.projection || 'EPSG:3857';
+  var type = geometry.getType();
+  if (type !== _geomGeometryTypeJsDefault.default.GEOMETRY_COLLECTION) {
+    geometry = geometry.clone().transform(projection, 'EPSG:4326');
+  }
+  var length = 0;
+  var coordinates, coords, i, ii, j, jj;
+  switch (type) {
+    case _geomGeometryTypeJsDefault.default.POINT:
+    case _geomGeometryTypeJsDefault.default.MULTI_POINT:
+      {
+        break;
+      }
+    case _geomGeometryTypeJsDefault.default.LINE_STRING:
+    case _geomGeometryTypeJsDefault.default.LINEAR_RING:
+      {
+        coordinates = /** @type {import("./geom/SimpleGeometry.js").default}*/
+        geometry.getCoordinates();
+        length = getLengthInternal(coordinates, radius);
+        break;
+      }
+    case _geomGeometryTypeJsDefault.default.MULTI_LINE_STRING:
+    case _geomGeometryTypeJsDefault.default.POLYGON:
+      {
+        coordinates = /** @type {import("./geom/SimpleGeometry.js").default}*/
+        geometry.getCoordinates();
+        for ((i = 0, ii = coordinates.length); i < ii; ++i) {
+          length += getLengthInternal(coordinates[i], radius);
+        }
+        break;
+      }
+    case _geomGeometryTypeJsDefault.default.MULTI_POLYGON:
+      {
+        coordinates = /** @type {import("./geom/SimpleGeometry.js").default}*/
+        geometry.getCoordinates();
+        for ((i = 0, ii = coordinates.length); i < ii; ++i) {
+          coords = coordinates[i];
+          for ((j = 0, jj = coords.length); j < jj; ++j) {
+            length += getLengthInternal(coords[j], radius);
+          }
+        }
+        break;
+      }
+    case _geomGeometryTypeJsDefault.default.GEOMETRY_COLLECTION:
+      {
+        var geometries = /** @type {import("./geom/GeometryCollection.js").default}*/
+        geometry.getGeometries();
+        for ((i = 0, ii = geometries.length); i < ii; ++i) {
+          length += getLength(geometries[i], opt_options);
+        }
+        break;
+      }
+    default:
+      {
+        throw new Error('Unsupported geometry type: ' + type);
+      }
+  }
+  return length;
+}
+/**
+* Returns the spherical area for a list of coordinates.
+*
+* [Reference](https://trs-new.jpl.nasa.gov/handle/2014/40409)
+* Robert. G. Chamberlain and William H. Duquette, "Some Algorithms for
+* Polygons on a Sphere", JPL Publication 07-03, Jet Propulsion
+* Laboratory, Pasadena, CA, June 2007
+*
+* @param {Array<import("./coordinate.js").Coordinate>} coordinates List of coordinates of a linear
+* ring. If the ring is oriented clockwise, the area will be positive,
+* otherwise it will be negative.
+* @param {number} radius The sphere radius.
+* @return {number} Area (in square meters).
+*/
+function getAreaInternal(coordinates, radius) {
+  var area = 0;
+  var len = coordinates.length;
+  var x1 = coordinates[len - 1][0];
+  var y1 = coordinates[len - 1][1];
+  for (var i = 0; i < len; i++) {
+    var x2 = coordinates[i][0];
+    var y2 = coordinates[i][1];
+    area += _mathJs.toRadians(x2 - x1) * (2 + Math.sin(_mathJs.toRadians(y1)) + Math.sin(_mathJs.toRadians(y2)));
+    x1 = x2;
+    y1 = y2;
+  }
+  return area * radius * radius / 2.0;
+}
+function getArea(geometry, opt_options) {
+  var options = opt_options || ({});
+  var radius = options.radius || DEFAULT_RADIUS;
+  var projection = options.projection || 'EPSG:3857';
+  var type = geometry.getType();
+  if (type !== _geomGeometryTypeJsDefault.default.GEOMETRY_COLLECTION) {
+    geometry = geometry.clone().transform(projection, 'EPSG:4326');
+  }
+  var area = 0;
+  var coordinates, coords, i, ii, j, jj;
+  switch (type) {
+    case _geomGeometryTypeJsDefault.default.POINT:
+    case _geomGeometryTypeJsDefault.default.MULTI_POINT:
+    case _geomGeometryTypeJsDefault.default.LINE_STRING:
+    case _geomGeometryTypeJsDefault.default.MULTI_LINE_STRING:
+    case _geomGeometryTypeJsDefault.default.LINEAR_RING:
+      {
+        break;
+      }
+    case _geomGeometryTypeJsDefault.default.POLYGON:
+      {
+        coordinates = /** @type {import("./geom/Polygon.js").default}*/
+        geometry.getCoordinates();
+        area = Math.abs(getAreaInternal(coordinates[0], radius));
+        for ((i = 1, ii = coordinates.length); i < ii; ++i) {
+          area -= Math.abs(getAreaInternal(coordinates[i], radius));
+        }
+        break;
+      }
+    case _geomGeometryTypeJsDefault.default.MULTI_POLYGON:
+      {
+        coordinates = /** @type {import("./geom/SimpleGeometry.js").default}*/
+        geometry.getCoordinates();
+        for ((i = 0, ii = coordinates.length); i < ii; ++i) {
+          coords = coordinates[i];
+          area += Math.abs(getAreaInternal(coords[0], radius));
+          for ((j = 1, jj = coords.length); j < jj; ++j) {
+            area -= Math.abs(getAreaInternal(coords[j], radius));
+          }
+        }
+        break;
+      }
+    case _geomGeometryTypeJsDefault.default.GEOMETRY_COLLECTION:
+      {
+        var geometries = /** @type {import("./geom/GeometryCollection.js").default}*/
+        geometry.getGeometries();
+        for ((i = 0, ii = geometries.length); i < ii; ++i) {
+          area += getArea(geometries[i], opt_options);
+        }
+        break;
+      }
+    default:
+      {
+        throw new Error('Unsupported geometry type: ' + type);
+      }
+  }
+  return area;
+}
+function offset(c1, distance, bearing, opt_radius) {
+  var radius = opt_radius || DEFAULT_RADIUS;
+  var lat1 = _mathJs.toRadians(c1[1]);
+  var lon1 = _mathJs.toRadians(c1[0]);
+  var dByR = distance / radius;
+  var lat = Math.asin(Math.sin(lat1) * Math.cos(dByR) + Math.cos(lat1) * Math.sin(dByR) * Math.cos(bearing));
+  var lon = lon1 + Math.atan2(Math.sin(bearing) * Math.sin(dByR) * Math.cos(lat1), Math.cos(dByR) - Math.sin(lat1) * Math.sin(lat));
+  return [_mathJs.toDegrees(lon), _mathJs.toDegrees(lat)];
+}

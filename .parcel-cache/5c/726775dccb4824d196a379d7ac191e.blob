@@ -1,0 +1,172 @@
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "all", function () {
+  return all;
+});
+_parcelHelpers.export(exports, "altKeyOnly", function () {
+  return altKeyOnly;
+});
+_parcelHelpers.export(exports, "altShiftKeysOnly", function () {
+  return altShiftKeysOnly;
+});
+_parcelHelpers.export(exports, "focus", function () {
+  return focus;
+});
+_parcelHelpers.export(exports, "focusWithTabindex", function () {
+  return focusWithTabindex;
+});
+_parcelHelpers.export(exports, "always", function () {
+  return always;
+});
+_parcelHelpers.export(exports, "click", function () {
+  return click;
+});
+_parcelHelpers.export(exports, "mouseActionButton", function () {
+  return mouseActionButton;
+});
+_parcelHelpers.export(exports, "never", function () {
+  return never;
+});
+_parcelHelpers.export(exports, "pointerMove", function () {
+  return pointerMove;
+});
+_parcelHelpers.export(exports, "singleClick", function () {
+  return singleClick;
+});
+_parcelHelpers.export(exports, "doubleClick", function () {
+  return doubleClick;
+});
+_parcelHelpers.export(exports, "noModifierKeys", function () {
+  return noModifierKeys;
+});
+_parcelHelpers.export(exports, "platformModifierKeyOnly", function () {
+  return platformModifierKeyOnly;
+});
+_parcelHelpers.export(exports, "shiftKeyOnly", function () {
+  return shiftKeyOnly;
+});
+_parcelHelpers.export(exports, "targetNotEditable", function () {
+  return targetNotEditable;
+});
+_parcelHelpers.export(exports, "mouseOnly", function () {
+  return mouseOnly;
+});
+_parcelHelpers.export(exports, "touchOnly", function () {
+  return touchOnly;
+});
+_parcelHelpers.export(exports, "penOnly", function () {
+  return penOnly;
+});
+_parcelHelpers.export(exports, "primaryAction", function () {
+  return primaryAction;
+});
+var _MapBrowserEventTypeJs = require('../MapBrowserEventType.js');
+var _MapBrowserEventTypeJsDefault = _parcelHelpers.interopDefault(_MapBrowserEventTypeJs);
+var _functionsJs = require('../functions.js');
+var _hasJs = require('../has.js');
+var _assertsJs = require('../asserts.js');
+function all(var_args) {
+  var conditions = arguments;
+  /**
+  * @param {import("../MapBrowserEvent.js").default} event Event.
+  * @return {boolean} All conditions passed.
+  */
+  return function (event) {
+    var pass = true;
+    for (var i = 0, ii = conditions.length; i < ii; ++i) {
+      pass = pass && conditions[i](event);
+      if (!pass) {
+        break;
+      }
+    }
+    return pass;
+  };
+}
+var altKeyOnly = function (mapBrowserEvent) {
+  var originalEvent = /** @type {KeyboardEvent|MouseEvent|TouchEvent}*/
+  mapBrowserEvent.originalEvent;
+  return originalEvent.altKey && !(originalEvent.metaKey || originalEvent.ctrlKey) && !originalEvent.shiftKey;
+};
+var altShiftKeysOnly = function (mapBrowserEvent) {
+  var originalEvent = /** @type {KeyboardEvent|MouseEvent|TouchEvent}*/
+  mapBrowserEvent.originalEvent;
+  return originalEvent.altKey && !(originalEvent.metaKey || originalEvent.ctrlKey) && originalEvent.shiftKey;
+};
+var focus = function (event) {
+  return event.target.getTargetElement().contains(document.activeElement);
+};
+var focusWithTabindex = function (event) {
+  return event.map.getTargetElement().hasAttribute('tabindex') ? focus(event) : true;
+};
+var always = _functionsJs.TRUE;
+var click = function (mapBrowserEvent) {
+  return mapBrowserEvent.type == _MapBrowserEventTypeJsDefault.default.CLICK;
+};
+var mouseActionButton = function (mapBrowserEvent) {
+  var originalEvent = /** @type {MouseEvent}*/
+  mapBrowserEvent.originalEvent;
+  return originalEvent.button == 0 && !(_hasJs.WEBKIT && _hasJs.MAC && originalEvent.ctrlKey);
+};
+var never = _functionsJs.FALSE;
+var pointerMove = function (mapBrowserEvent) {
+  return mapBrowserEvent.type == 'pointermove';
+};
+var singleClick = function (mapBrowserEvent) {
+  return mapBrowserEvent.type == _MapBrowserEventTypeJsDefault.default.SINGLECLICK;
+};
+var doubleClick = function (mapBrowserEvent) {
+  return mapBrowserEvent.type == _MapBrowserEventTypeJsDefault.default.DBLCLICK;
+};
+var noModifierKeys = function (mapBrowserEvent) {
+  var originalEvent = /** @type {KeyboardEvent|MouseEvent|TouchEvent}*/
+  mapBrowserEvent.originalEvent;
+  return !originalEvent.altKey && !(originalEvent.metaKey || originalEvent.ctrlKey) && !originalEvent.shiftKey;
+};
+var platformModifierKeyOnly = function (mapBrowserEvent) {
+  var originalEvent = /** @type {KeyboardEvent|MouseEvent|TouchEvent}*/
+  mapBrowserEvent.originalEvent;
+  return !originalEvent.altKey && (_hasJs.MAC ? originalEvent.metaKey : originalEvent.ctrlKey) && !originalEvent.shiftKey;
+};
+var shiftKeyOnly = function (mapBrowserEvent) {
+  var originalEvent = /** @type {KeyboardEvent|MouseEvent|TouchEvent}*/
+  mapBrowserEvent.originalEvent;
+  return !originalEvent.altKey && !(originalEvent.metaKey || originalEvent.ctrlKey) && originalEvent.shiftKey;
+};
+var targetNotEditable = function (mapBrowserEvent) {
+  var originalEvent = /** @type {KeyboardEvent|MouseEvent|TouchEvent}*/
+  mapBrowserEvent.originalEvent;
+  var tagName = /** @type {Element}*/
+  originalEvent.target.tagName;
+  return tagName !== 'INPUT' && tagName !== 'SELECT' && tagName !== 'TEXTAREA';
+};
+var mouseOnly = function (mapBrowserEvent) {
+  var pointerEvent = /** @type {import("../MapBrowserEvent").default}*/
+  mapBrowserEvent.originalEvent;
+  _assertsJs.assert(pointerEvent !== undefined, 56);
+  // mapBrowserEvent must originate from a pointer event
+  // see http://www.w3.org/TR/pointerevents/#widl-PointerEvent-pointerType
+  return pointerEvent.pointerType == 'mouse';
+};
+var touchOnly = function (mapBrowserEvent) {
+  var pointerEvt = /** @type {import("../MapBrowserEvent").default}*/
+  mapBrowserEvent.originalEvent;
+  _assertsJs.assert(pointerEvt !== undefined, 56);
+  // mapBrowserEvent must originate from a pointer event
+  // see http://www.w3.org/TR/pointerevents/#widl-PointerEvent-pointerType
+  return pointerEvt.pointerType === 'touch';
+};
+var penOnly = function (mapBrowserEvent) {
+  var pointerEvt = /** @type {import("../MapBrowserEvent").default}*/
+  mapBrowserEvent.originalEvent;
+  _assertsJs.assert(pointerEvt !== undefined, 56);
+  // mapBrowserEvent must originate from a pointer event
+  // see http://www.w3.org/TR/pointerevents/#widl-PointerEvent-pointerType
+  return pointerEvt.pointerType === 'pen';
+};
+var primaryAction = function (mapBrowserEvent) {
+  var pointerEvent = /** @type {import("../MapBrowserEvent").default}*/
+  mapBrowserEvent.originalEvent;
+  _assertsJs.assert(pointerEvent !== undefined, 56);
+  // mapBrowserEvent must originate from a pointer event
+  return pointerEvent.isPrimary && pointerEvent.button === 0;
+};

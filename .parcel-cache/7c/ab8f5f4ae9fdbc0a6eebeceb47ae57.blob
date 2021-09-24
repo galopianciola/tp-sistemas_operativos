@@ -1,0 +1,10 @@
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "ERROR_THRESHOLD", function () {
+  return ERROR_THRESHOLD;
+});
+_parcelHelpers.export(exports, "ENABLE_RASTER_REPROJECTION", function () {
+  return ENABLE_RASTER_REPROJECTION;
+});
+var ERROR_THRESHOLD = 0.5;
+var ENABLE_RASTER_REPROJECTION = true;

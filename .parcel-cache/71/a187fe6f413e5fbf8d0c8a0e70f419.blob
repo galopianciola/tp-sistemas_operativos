@@ -1,0 +1,201 @@
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "add", function () {
+  return add;
+});
+_parcelHelpers.export(exports, "closestOnCircle", function () {
+  return closestOnCircle;
+});
+_parcelHelpers.export(exports, "closestOnSegment", function () {
+  return closestOnSegment;
+});
+_parcelHelpers.export(exports, "createStringXY", function () {
+  return createStringXY;
+});
+_parcelHelpers.export(exports, "degreesToStringHDMS", function () {
+  return degreesToStringHDMS;
+});
+_parcelHelpers.export(exports, "format", function () {
+  return format;
+});
+_parcelHelpers.export(exports, "equals", function () {
+  return equals;
+});
+_parcelHelpers.export(exports, "rotate", function () {
+  return rotate;
+});
+_parcelHelpers.export(exports, "scale", function () {
+  return scale;
+});
+_parcelHelpers.export(exports, "squaredDistance", function () {
+  return squaredDistance;
+});
+_parcelHelpers.export(exports, "distance", function () {
+  return distance;
+});
+_parcelHelpers.export(exports, "squaredDistanceToSegment", function () {
+  return squaredDistanceToSegment;
+});
+_parcelHelpers.export(exports, "toStringHDMS", function () {
+  return toStringHDMS;
+});
+_parcelHelpers.export(exports, "toStringXY", function () {
+  return toStringXY;
+});
+_parcelHelpers.export(exports, "wrapX", function () {
+  return wrapX;
+});
+_parcelHelpers.export(exports, "getWorldsAway", function () {
+  return getWorldsAway;
+});
+var _extentJs = require('./extent.js');
+var _mathJs = require('./math.js');
+var _stringJs = require('./string.js');
+function add(coordinate, delta) {
+  coordinate[0] += +delta[0];
+  coordinate[1] += +delta[1];
+  return coordinate;
+}
+function closestOnCircle(coordinate, circle) {
+  var r = circle.getRadius();
+  var center = circle.getCenter();
+  var x0 = center[0];
+  var y0 = center[1];
+  var x1 = coordinate[0];
+  var y1 = coordinate[1];
+  var dx = x1 - x0;
+  var dy = y1 - y0;
+  if (dx === 0 && dy === 0) {
+    dx = 1;
+  }
+  var d = Math.sqrt(dx * dx + dy * dy);
+  var x = x0 + r * dx / d;
+  var y = y0 + r * dy / d;
+  return [x, y];
+}
+function closestOnSegment(coordinate, segment) {
+  var x0 = coordinate[0];
+  var y0 = coordinate[1];
+  var start = segment[0];
+  var end = segment[1];
+  var x1 = start[0];
+  var y1 = start[1];
+  var x2 = end[0];
+  var y2 = end[1];
+  var dx = x2 - x1;
+  var dy = y2 - y1;
+  var along = dx === 0 && dy === 0 ? 0 : (dx * (x0 - x1) + dy * (y0 - y1)) / (dx * dx + dy * dy || 0);
+  var x, y;
+  if (along <= 0) {
+    x = x1;
+    y = y1;
+  } else if (along >= 1) {
+    x = x2;
+    y = y2;
+  } else {
+    x = x1 + along * dx;
+    y = y1 + along * dy;
+  }
+  return [x, y];
+}
+function createStringXY(opt_fractionDigits) {
+  return (
+    /**
+    * @param {Coordinate} coordinate Coordinate.
+    * @return {string} String XY.
+    */
+    function (coordinate) {
+      return toStringXY(coordinate, opt_fractionDigits);
+    }
+  );
+}
+function degreesToStringHDMS(hemispheres, degrees, opt_fractionDigits) {
+  var normalizedDegrees = _mathJs.modulo(degrees + 180, 360) - 180;
+  var x = Math.abs(3600 * normalizedDegrees);
+  var dflPrecision = opt_fractionDigits || 0;
+  var precision = Math.pow(10, dflPrecision);
+  var deg = Math.floor(x / 3600);
+  var min = Math.floor((x - deg * 3600) / 60);
+  var sec = x - deg * 3600 - min * 60;
+  sec = Math.ceil(sec * precision) / precision;
+  if (sec >= 60) {
+    sec = 0;
+    min += 1;
+  }
+  if (min >= 60) {
+    min = 0;
+    deg += 1;
+  }
+  return deg + '\u00b0 ' + _stringJs.padNumber(min, 2) + '\u2032 ' + _stringJs.padNumber(sec, 2, dflPrecision) + '\u2033' + (normalizedDegrees == 0 ? '' : ' ' + hemispheres.charAt(normalizedDegrees < 0 ? 1 : 0));
+}
+function format(coordinate, template, opt_fractionDigits) {
+  if (coordinate) {
+    return template.replace('{x}', coordinate[0].toFixed(opt_fractionDigits)).replace('{y}', coordinate[1].toFixed(opt_fractionDigits));
+  } else {
+    return '';
+  }
+}
+function equals(coordinate1, coordinate2) {
+  var equals = true;
+  for (var i = coordinate1.length - 1; i >= 0; --i) {
+    if (coordinate1[i] != coordinate2[i]) {
+      equals = false;
+      break;
+    }
+  }
+  return equals;
+}
+function rotate(coordinate, angle) {
+  var cosAngle = Math.cos(angle);
+  var sinAngle = Math.sin(angle);
+  var x = coordinate[0] * cosAngle - coordinate[1] * sinAngle;
+  var y = coordinate[1] * cosAngle + coordinate[0] * sinAngle;
+  coordinate[0] = x;
+  coordinate[1] = y;
+  return coordinate;
+}
+function scale(coordinate, scale) {
+  coordinate[0] *= scale;
+  coordinate[1] *= scale;
+  return coordinate;
+}
+function squaredDistance(coord1, coord2) {
+  var dx = coord1[0] - coord2[0];
+  var dy = coord1[1] - coord2[1];
+  return dx * dx + dy * dy;
+}
+function distance(coord1, coord2) {
+  return Math.sqrt(squaredDistance(coord1, coord2));
+}
+function squaredDistanceToSegment(coordinate, segment) {
+  return squaredDistance(coordinate, closestOnSegment(coordinate, segment));
+}
+function toStringHDMS(coordinate, opt_fractionDigits) {
+  if (coordinate) {
+    return degreesToStringHDMS('NS', coordinate[1], opt_fractionDigits) + ' ' + degreesToStringHDMS('EW', coordinate[0], opt_fractionDigits);
+  } else {
+    return '';
+  }
+}
+function toStringXY(coordinate, opt_fractionDigits) {
+  return format(coordinate, '{x}, {y}', opt_fractionDigits);
+}
+function wrapX(coordinate, projection) {
+  if (projection.canWrapX()) {
+    var worldWidth = _extentJs.getWidth(projection.getExtent());
+    var worldsAway = getWorldsAway(coordinate, projection, worldWidth);
+    if (worldsAway) {
+      coordinate[0] -= worldsAway * worldWidth;
+    }
+  }
+  return coordinate;
+}
+function getWorldsAway(coordinate, projection, opt_sourceExtentWidth) {
+  var projectionExtent = projection.getExtent();
+  var worldsAway = 0;
+  if (projection.canWrapX() && (coordinate[0] < projectionExtent[0] || coordinate[0] > projectionExtent[2])) {
+    var sourceExtentWidth = opt_sourceExtentWidth || _extentJs.getWidth(projectionExtent);
+    worldsAway = Math.floor((coordinate[0] - projectionExtent[0]) / sourceExtentWidth);
+  }
+  return worldsAway;
+}

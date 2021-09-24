@@ -1,0 +1,48 @@
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "clear", function () {
+  return clear;
+});
+_parcelHelpers.export(exports, "add", function () {
+  return add;
+});
+_parcelHelpers.export(exports, "remove", function () {
+  return remove;
+});
+_parcelHelpers.export(exports, "get", function () {
+  return get;
+});
+var _objJs = require('../obj.js');
+/**
+* @private
+* @type {!Object<string, Object<string, import("../proj.js").TransformFunction>>}
+*/
+var transforms = {};
+function clear() {
+  transforms = {};
+}
+function add(source, destination, transformFn) {
+  var sourceCode = source.getCode();
+  var destinationCode = destination.getCode();
+  if (!((sourceCode in transforms))) {
+    transforms[sourceCode] = {};
+  }
+  transforms[sourceCode][destinationCode] = transformFn;
+}
+function remove(source, destination) {
+  var sourceCode = source.getCode();
+  var destinationCode = destination.getCode();
+  var transform = transforms[sourceCode][destinationCode];
+  delete transforms[sourceCode][destinationCode];
+  if (_objJs.isEmpty(transforms[sourceCode])) {
+    delete transforms[sourceCode];
+  }
+  return transform;
+}
+function get(sourceCode, destinationCode) {
+  var transform;
+  if ((sourceCode in transforms) && (destinationCode in transforms[sourceCode])) {
+    transform = transforms[sourceCode][destinationCode];
+  }
+  return transform;
+}

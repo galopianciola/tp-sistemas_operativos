@@ -1,0 +1,40 @@
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "TRUE", function () {
+  return TRUE;
+});
+_parcelHelpers.export(exports, "FALSE", function () {
+  return FALSE;
+});
+_parcelHelpers.export(exports, "VOID", function () {
+  return VOID;
+});
+_parcelHelpers.export(exports, "memoizeOne", function () {
+  return memoizeOne;
+});
+var _arrayJs = require('./array.js');
+function TRUE() {
+  return true;
+}
+function FALSE() {
+  return false;
+}
+function VOID() {}
+function memoizeOne(fn) {
+  var called = false;
+  /** @type {ReturnType}*/
+  var lastResult;
+  /** @type {Array<any>}*/
+  var lastArgs;
+  var lastThis;
+  return function () {
+    var nextArgs = Array.prototype.slice.call(arguments);
+    if (!called || this !== lastThis || !_arrayJs.equals(nextArgs, lastArgs)) {
+      called = true;
+      lastThis = this;
+      lastArgs = nextArgs;
+      lastResult = fn.apply(this, arguments);
+    }
+    return lastResult;
+  };
+}

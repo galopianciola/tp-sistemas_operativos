@@ -1,0 +1,38 @@
+{
+    "name": "icvol",
+    "version": "1.0.2",
+    "description": "ICV with OpenLayers",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "parcel serve ./src/index.html",
+        "build": "parcel build ./src/index.html"
+    },
+    "engines": {
+        "node": ">= 14.0.0"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "chroma-js": "^2.1.0",
+        "express": "^4.17.1",
+        "express-openid-connect": "^2.5.0",
+        "ol": "^6.5.0",
+        "ol-geocoder": "^4.1.2",
+        "ol-mapbox-style": "^6.4.1"
+    },
+    "devDependencies": {
+        "parcel": "^2.0.0-beta.2"
+    },
+    "browserslist": {
+        "production": [
+            "last 3 chrome versions",
+            "last 3 firefox versions",
+            "last 3 safari versions"
+        ],
+        "development": [
+            "last 1 chrome version",
+            "last 1 firefox version",
+            "last 1 safari version"
+        ]
+    }
+}

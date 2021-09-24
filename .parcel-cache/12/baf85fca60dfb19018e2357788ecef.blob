@@ -1,0 +1,142 @@
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "clamp", function () {
+  return clamp;
+});
+_parcelHelpers.export(exports, "cosh", function () {
+  return cosh;
+});
+_parcelHelpers.export(exports, "log2", function () {
+  return log2;
+});
+_parcelHelpers.export(exports, "squaredSegmentDistance", function () {
+  return squaredSegmentDistance;
+});
+_parcelHelpers.export(exports, "squaredDistance", function () {
+  return squaredDistance;
+});
+_parcelHelpers.export(exports, "solveLinearSystem", function () {
+  return solveLinearSystem;
+});
+_parcelHelpers.export(exports, "toDegrees", function () {
+  return toDegrees;
+});
+_parcelHelpers.export(exports, "toRadians", function () {
+  return toRadians;
+});
+_parcelHelpers.export(exports, "modulo", function () {
+  return modulo;
+});
+_parcelHelpers.export(exports, "lerp", function () {
+  return lerp;
+});
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max);
+}
+var cosh = (function () {
+  // Wrapped in a iife, to save the overhead of checking for the native
+  // implementation on every invocation.
+  var cosh;
+  if (('cosh' in Math)) {
+    // The environment supports the native Math.cosh function, use it…
+    cosh = Math.cosh;
+  } else {
+    // … else, use the reference implementation of MDN:
+    cosh = function (x) {
+      var y = /** @type {Math}*/
+      Math.exp(x);
+      return (y + 1 / y) / 2;
+    };
+  }
+  return cosh;
+})();
+var log2 = (function () {
+  // Wrapped in a iife, to save the overhead of checking for the native
+  // implementation on every invocation.
+  var log2;
+  if (('log2' in Math)) {
+    // The environment supports the native Math.log2 function, use it…
+    log2 = Math.log2;
+  } else {
+    // … else, use the reference implementation of MDN:
+    log2 = function (x) {
+      return Math.log(x) * Math.LOG2E;
+    };
+  }
+  return log2;
+})();
+function squaredSegmentDistance(x, y, x1, y1, x2, y2) {
+  var dx = x2 - x1;
+  var dy = y2 - y1;
+  if (dx !== 0 || dy !== 0) {
+    var t = ((x - x1) * dx + (y - y1) * dy) / (dx * dx + dy * dy);
+    if (t > 1) {
+      x1 = x2;
+      y1 = y2;
+    } else if (t > 0) {
+      x1 += dx * t;
+      y1 += dy * t;
+    }
+  }
+  return squaredDistance(x, y, x1, y1);
+}
+function squaredDistance(x1, y1, x2, y2) {
+  var dx = x2 - x1;
+  var dy = y2 - y1;
+  return dx * dx + dy * dy;
+}
+function solveLinearSystem(mat) {
+  var n = mat.length;
+  for (var i = 0; i < n; i++) {
+    // Find max in the i-th column (ignoring i - 1 first rows)
+    var maxRow = i;
+    var maxEl = Math.abs(mat[i][i]);
+    for (var r = i + 1; r < n; r++) {
+      var absValue = Math.abs(mat[r][i]);
+      if (absValue > maxEl) {
+        maxEl = absValue;
+        maxRow = r;
+      }
+    }
+    if (maxEl === 0) {
+      return null;
+    }
+    // Swap max row with i-th (current) row
+    var tmp = mat[maxRow];
+    mat[maxRow] = mat[i];
+    mat[i] = tmp;
+    // Subtract the i-th row to make all the remaining rows 0 in the i-th column
+    for (var j = i + 1; j < n; j++) {
+      var coef = -mat[j][i] / mat[i][i];
+      for (var k = i; k < n + 1; k++) {
+        if (i == k) {
+          mat[j][k] = 0;
+        } else {
+          mat[j][k] += coef * mat[i][k];
+        }
+      }
+    }
+  }
+  // Solve Ax=b for upper triangular matrix A (mat)
+  var x = new Array(n);
+  for (var l = n - 1; l >= 0; l--) {
+    x[l] = mat[l][n] / mat[l][l];
+    for (var m = l - 1; m >= 0; m--) {
+      mat[m][n] -= mat[m][l] * x[l];
+    }
+  }
+  return x;
+}
+function toDegrees(angleInRadians) {
+  return angleInRadians * 180 / Math.PI;
+}
+function toRadians(angleInDegrees) {
+  return angleInDegrees * Math.PI / 180;
+}
+function modulo(a, b) {
+  var r = a % b;
+  return r * b < 0 ? r + b : r;
+}
+function lerp(a, b, x) {
+  return a + x * (b - a);
+}

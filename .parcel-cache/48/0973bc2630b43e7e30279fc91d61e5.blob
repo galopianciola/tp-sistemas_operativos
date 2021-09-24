@@ -1,0 +1,67 @@
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "stopPropagation", function () {
+  return stopPropagation;
+});
+_parcelHelpers.export(exports, "preventDefault", function () {
+  return preventDefault;
+});
+/**
+* @module ol/events/Event
+*/
+/**
+* @classdesc
+* Stripped down implementation of the W3C DOM Level 2 Event interface.
+* See https://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-interface.
+*
+* This implementation only provides `type` and `target` properties, and
+* `stopPropagation` and `preventDefault` methods. It is meant as base class
+* for higher level events defined in the library, and works with
+* {@link module:ol/events/Target~Target}.
+*/
+var BaseEvent = /** @class*/
+(function () {
+  /**
+  * @param {string} type Type.
+  */
+  function BaseEvent(type) {
+    /**
+    * @type {boolean}
+    */
+    this.propagationStopped;
+    /**
+    * The event type.
+    * @type {string}
+    * @api
+    */
+    this.type = type;
+    /**
+    * The event target.
+    * @type {Object}
+    * @api
+    */
+    this.target = null;
+  }
+  /**
+  * Stop event propagation.
+  * @api
+  */
+  BaseEvent.prototype.preventDefault = function () {
+    this.propagationStopped = true;
+  };
+  /**
+  * Stop event propagation.
+  * @api
+  */
+  BaseEvent.prototype.stopPropagation = function () {
+    this.propagationStopped = true;
+  };
+  return BaseEvent;
+})();
+function stopPropagation(evt) {
+  evt.stopPropagation();
+}
+function preventDefault(evt) {
+  evt.preventDefault();
+}
+exports.default = BaseEvent;

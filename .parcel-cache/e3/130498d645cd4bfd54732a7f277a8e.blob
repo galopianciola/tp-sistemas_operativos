@@ -1,0 +1,241 @@
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+var _BaseJs = require('./Base.js');
+var _BaseJsDefault = _parcelHelpers.interopDefault(_BaseJs);
+var _CollectionJs = require('../Collection.js');
+var _CollectionJsDefault = _parcelHelpers.interopDefault(_CollectionJs);
+var _CollectionEventTypeJs = require('../CollectionEventType.js');
+var _CollectionEventTypeJsDefault = _parcelHelpers.interopDefault(_CollectionEventTypeJs);
+var _eventsEventTypeJs = require('../events/EventType.js');
+var _eventsEventTypeJsDefault = _parcelHelpers.interopDefault(_eventsEventTypeJs);
+var _ObjectEventTypeJs = require('../ObjectEventType.js');
+var _ObjectEventTypeJsDefault = _parcelHelpers.interopDefault(_ObjectEventTypeJs);
+var _sourceStateJs = require('../source/State.js');
+var _sourceStateJsDefault = _parcelHelpers.interopDefault(_sourceStateJs);
+var _assertsJs = require('../asserts.js');
+var _objJs = require('../obj.js');
+var _ObjectJs = require('../Object.js');
+var _extentJs = require('../extent.js');
+var _utilJs = require('../util.js');
+var _eventsJs = require('../events.js');
+var __extends = undefined && undefined.__extends || (function () {
+  var extendStatics = function (d, b) {
+    extendStatics = Object.setPrototypeOf || ({
+      __proto__: []
+    }) instanceof Array && (function (d, b) {
+      d.__proto__ = b;
+    }) || (function (d, b) {
+      for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p];
+    });
+    return extendStatics(d, b);
+  };
+  return function (d, b) {
+    extendStatics(d, b);
+    function __() {
+      this.constructor = d;
+    }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+})();
+/**
+* @typedef {Object} Options
+* @property {number} [opacity=1] Opacity (0, 1).
+* @property {boolean} [visible=true] Visibility.
+* @property {import("../extent.js").Extent} [extent] The bounding extent for layer rendering.  The layer will not be
+* rendered outside of this extent.
+* @property {number} [zIndex] The z-index for layer rendering.  At rendering time, the layers
+* will be ordered, first by Z-index and then by position. When `undefined`, a `zIndex` of 0 is assumed
+* for layers that are added to the map's `layers` collection, or `Infinity` when the layer's `setMap()`
+* method was used.
+* @property {number} [minResolution] The minimum resolution (inclusive) at which this layer will be
+* visible.
+* @property {number} [maxResolution] The maximum resolution (exclusive) below which this layer will
+* be visible.
+* @property {number} [minZoom] The minimum view zoom level (exclusive) above which this layer will be
+* visible.
+* @property {number} [maxZoom] The maximum view zoom level (inclusive) at which this layer will
+* be visible.
+* @property {number} [minZoom] The minimum view zoom level (exclusive) above which this layer will be
+* visible.
+* @property {number} [maxZoom] The maximum view zoom level (inclusive) at which this layer will
+* be visible.
+* @property {Array<import("./Base.js").default>|import("../Collection.js").default<import("./Base.js").default>} [layers] Child layers.
+*/
+/**
+* @enum {string}
+* @private
+*/
+var Property = {
+  LAYERS: 'layers'
+};
+/**
+* @classdesc
+* A {@link module:ol/Collection~Collection} of layers that are handled together.
+*
+* A generic `change` event is triggered when the group/Collection changes.
+*
+* @api
+*/
+var LayerGroup = /** @class*/
+(function (_super) {
+  __extends(LayerGroup, _super);
+  /**
+  * @param {Options=} opt_options Layer options.
+  */
+  function LayerGroup(opt_options) {
+    var _this = this;
+    var options = opt_options || ({});
+    var baseOptions = /** @type {Options}*/
+    _objJs.assign({}, options);
+    delete baseOptions.layers;
+    var layers = options.layers;
+    _this = _super.call(this, baseOptions) || this;
+    /**
+    * @private
+    * @type {Array<import("../events.js").EventsKey>}
+    */
+    _this.layersListenerKeys_ = [];
+    /**
+    * @private
+    * @type {Object<string, Array<import("../events.js").EventsKey>>}
+    */
+    _this.listenerKeys_ = {};
+    _this.addEventListener(_ObjectJs.getChangeEventType(Property.LAYERS), _this.handleLayersChanged_);
+    if (layers) {
+      if (Array.isArray(layers)) {
+        layers = new _CollectionJsDefault.default(layers.slice(), {
+          unique: true
+        });
+      } else {
+        _assertsJs.assert(typeof /** @type {?}*/
+        layers.getArray === 'function', 43);
+      }
+    } else {
+      layers = new _CollectionJsDefault.default(undefined, {
+        unique: true
+      });
+    }
+    _this.setLayers(layers);
+    return _this;
+  }
+  /**
+  * @private
+  */
+  LayerGroup.prototype.handleLayerChange_ = function () {
+    this.changed();
+  };
+  /**
+  * @private
+  */
+  LayerGroup.prototype.handleLayersChanged_ = function () {
+    this.layersListenerKeys_.forEach(_eventsJs.unlistenByKey);
+    this.layersListenerKeys_.length = 0;
+    var layers = this.getLayers();
+    this.layersListenerKeys_.push(_eventsJs.listen(layers, _CollectionEventTypeJsDefault.default.ADD, this.handleLayersAdd_, this), _eventsJs.listen(layers, _CollectionEventTypeJsDefault.default.REMOVE, this.handleLayersRemove_, this));
+    for (var id in this.listenerKeys_) {
+      this.listenerKeys_[id].forEach(_eventsJs.unlistenByKey);
+    }
+    _objJs.clear(this.listenerKeys_);
+    var layersArray = layers.getArray();
+    for (var i = 0, ii = layersArray.length; i < ii; i++) {
+      var layer = layersArray[i];
+      this.listenerKeys_[_utilJs.getUid(layer)] = [_eventsJs.listen(layer, _ObjectEventTypeJsDefault.default.PROPERTYCHANGE, this.handleLayerChange_, this), _eventsJs.listen(layer, _eventsEventTypeJsDefault.default.CHANGE, this.handleLayerChange_, this)];
+    }
+    this.changed();
+  };
+  /**
+  * @param {import("../Collection.js").CollectionEvent} collectionEvent CollectionEvent.
+  * @private
+  */
+  LayerGroup.prototype.handleLayersAdd_ = function (collectionEvent) {
+    var layer = /** @type {import("./Base.js").default}*/
+    collectionEvent.element;
+    this.listenerKeys_[_utilJs.getUid(layer)] = [_eventsJs.listen(layer, _ObjectEventTypeJsDefault.default.PROPERTYCHANGE, this.handleLayerChange_, this), _eventsJs.listen(layer, _eventsEventTypeJsDefault.default.CHANGE, this.handleLayerChange_, this)];
+    this.changed();
+  };
+  /**
+  * @param {import("../Collection.js").CollectionEvent} collectionEvent CollectionEvent.
+  * @private
+  */
+  LayerGroup.prototype.handleLayersRemove_ = function (collectionEvent) {
+    var layer = /** @type {import("./Base.js").default}*/
+    collectionEvent.element;
+    var key = _utilJs.getUid(layer);
+    this.listenerKeys_[key].forEach(_eventsJs.unlistenByKey);
+    delete this.listenerKeys_[key];
+    this.changed();
+  };
+  /**
+  * Returns the {@link module:ol/Collection collection} of {@link module:ol/layer/Layer~Layer layers}
+  * in this group.
+  * @return {!import("../Collection.js").default<import("./Base.js").default>} Collection of
+  *   {@link module:ol/layer/Base layers} that are part of this group.
+  * @observable
+  * @api
+  */
+  LayerGroup.prototype.getLayers = function () {
+    return (
+      /** @type {!import("../Collection.js").default<import("./Base.js").default>}*/
+      this.get(Property.LAYERS)
+    );
+  };
+  /**
+  * Set the {@link module:ol/Collection collection} of {@link module:ol/layer/Layer~Layer layers}
+  * in this group.
+  * @param {!import("../Collection.js").default<import("./Base.js").default>} layers Collection of
+  *   {@link module:ol/layer/Base layers} that are part of this group.
+  * @observable
+  * @api
+  */
+  LayerGroup.prototype.setLayers = function (layers) {
+    this.set(Property.LAYERS, layers);
+  };
+  /**
+  * @param {Array<import("./Layer.js").default>=} opt_array Array of layers (to be modified in place).
+  * @return {Array<import("./Layer.js").default>} Array of layers.
+  */
+  LayerGroup.prototype.getLayersArray = function (opt_array) {
+    var array = opt_array !== undefined ? opt_array : [];
+    this.getLayers().forEach(function (layer) {
+      layer.getLayersArray(array);
+    });
+    return array;
+  };
+  /**
+  * @param {Array<import("./Layer.js").State>=} opt_states Optional list of layer states (to be modified in place).
+  * @return {Array<import("./Layer.js").State>} List of layer states.
+  */
+  LayerGroup.prototype.getLayerStatesArray = function (opt_states) {
+    var states = opt_states !== undefined ? opt_states : [];
+    var pos = states.length;
+    this.getLayers().forEach(function (layer) {
+      layer.getLayerStatesArray(states);
+    });
+    var ownLayerState = this.getLayerState();
+    for (var i = pos, ii = states.length; i < ii; i++) {
+      var layerState = states[i];
+      layerState.opacity *= ownLayerState.opacity;
+      layerState.visible = layerState.visible && ownLayerState.visible;
+      layerState.maxResolution = Math.min(layerState.maxResolution, ownLayerState.maxResolution);
+      layerState.minResolution = Math.max(layerState.minResolution, ownLayerState.minResolution);
+      layerState.minZoom = Math.max(layerState.minZoom, ownLayerState.minZoom);
+      layerState.maxZoom = Math.min(layerState.maxZoom, ownLayerState.maxZoom);
+      if (ownLayerState.extent !== undefined) {
+        if (layerState.extent !== undefined) {
+          layerState.extent = _extentJs.getIntersection(layerState.extent, ownLayerState.extent);
+        } else {
+          layerState.extent = ownLayerState.extent;
+        }
+      }
+    }
+    return states;
+  };
+  /**
+  * @return {import("../source/State.js").default} Source state.
+  */
+  LayerGroup.prototype.getSourceState = function () {
+    return _sourceStateJsDefault.default.READY;
+  };
+  return LayerGroup;
+})(_BaseJsDefault.default);
+exports.default = LayerGroup;

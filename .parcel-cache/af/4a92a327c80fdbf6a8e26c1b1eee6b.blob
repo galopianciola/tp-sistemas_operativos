@@ -1,0 +1,40 @@
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "fillInstruction", function () {
+  return fillInstruction;
+});
+_parcelHelpers.export(exports, "strokeInstruction", function () {
+  return strokeInstruction;
+});
+_parcelHelpers.export(exports, "beginPathInstruction", function () {
+  return beginPathInstruction;
+});
+_parcelHelpers.export(exports, "closePathInstruction", function () {
+  return closePathInstruction;
+});
+/**
+* @module ol/render/canvas/Instruction
+*/
+/**
+* @enum {number}
+*/
+var Instruction = {
+  BEGIN_GEOMETRY: 0,
+  BEGIN_PATH: 1,
+  CIRCLE: 2,
+  CLOSE_PATH: 3,
+  CUSTOM: 4,
+  DRAW_CHARS: 5,
+  DRAW_IMAGE: 6,
+  END_GEOMETRY: 7,
+  FILL: 8,
+  MOVE_TO_LINE_TO: 9,
+  SET_FILL_STYLE: 10,
+  SET_STROKE_STYLE: 11,
+  STROKE: 12
+};
+var fillInstruction = [Instruction.FILL];
+var strokeInstruction = [Instruction.STROKE];
+var beginPathInstruction = [Instruction.BEGIN_PATH];
+var closePathInstruction = [Instruction.CLOSE_PATH];
+exports.default = Instruction;

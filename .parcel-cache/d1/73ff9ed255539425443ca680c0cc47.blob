@@ -1,0 +1,106 @@
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "createFromTemplate", function () {
+  return createFromTemplate;
+});
+_parcelHelpers.export(exports, "createFromTemplates", function () {
+  return createFromTemplates;
+});
+_parcelHelpers.export(exports, "createFromTileUrlFunctions", function () {
+  return createFromTileUrlFunctions;
+});
+_parcelHelpers.export(exports, "nullTileUrlFunction", function () {
+  return nullTileUrlFunction;
+});
+_parcelHelpers.export(exports, "expandUrl", function () {
+  return expandUrl;
+});
+var _assertsJs = require('./asserts.js');
+var _mathJs = require('./math.js');
+var _tilecoordJs = require('./tilecoord.js');
+function createFromTemplate(template, tileGrid) {
+  var zRegEx = /\{z\}/g;
+  var xRegEx = /\{x\}/g;
+  var yRegEx = /\{y\}/g;
+  var dashYRegEx = /\{-y\}/g;
+  return (
+    /**
+    * @param {import("./tilecoord.js").TileCoord} tileCoord Tile Coordinate.
+    * @param {number} pixelRatio Pixel ratio.
+    * @param {import("./proj/Projection.js").default} projection Projection.
+    * @return {string|undefined} Tile URL.
+    */
+    function (tileCoord, pixelRatio, projection) {
+      if (!tileCoord) {
+        return undefined;
+      } else {
+        return template.replace(zRegEx, tileCoord[0].toString()).replace(xRegEx, tileCoord[1].toString()).replace(yRegEx, tileCoord[2].toString()).replace(dashYRegEx, function () {
+          var z = tileCoord[0];
+          var range = tileGrid.getFullTileRange(z);
+          _assertsJs.assert(range, 55);
+          // The {-y} placeholder requires a tile grid with extent
+          var y = range.getHeight() - tileCoord[2] - 1;
+          return y.toString();
+        });
+      }
+    }
+  );
+}
+function createFromTemplates(templates, tileGrid) {
+  var len = templates.length;
+  var tileUrlFunctions = new Array(len);
+  for (var i = 0; i < len; ++i) {
+    tileUrlFunctions[i] = createFromTemplate(templates[i], tileGrid);
+  }
+  return createFromTileUrlFunctions(tileUrlFunctions);
+}
+function createFromTileUrlFunctions(tileUrlFunctions) {
+  if (tileUrlFunctions.length === 1) {
+    return tileUrlFunctions[0];
+  }
+  return (
+    /**
+    * @param {import("./tilecoord.js").TileCoord} tileCoord Tile Coordinate.
+    * @param {number} pixelRatio Pixel ratio.
+    * @param {import("./proj/Projection.js").default} projection Projection.
+    * @return {string|undefined} Tile URL.
+    */
+    function (tileCoord, pixelRatio, projection) {
+      if (!tileCoord) {
+        return undefined;
+      } else {
+        var h = _tilecoordJs.hash(tileCoord);
+        var index = _mathJs.modulo(h, tileUrlFunctions.length);
+        return tileUrlFunctions[index](tileCoord, pixelRatio, projection);
+      }
+    }
+  );
+}
+function nullTileUrlFunction(tileCoord, pixelRatio, projection) {
+  return undefined;
+}
+function expandUrl(url) {
+  var urls = [];
+  var match = (/\{([a-z])-([a-z])\}/).exec(url);
+  if (match) {
+    // char range
+    var startCharCode = match[1].charCodeAt(0);
+    var stopCharCode = match[2].charCodeAt(0);
+    var charCode = void 0;
+    for (charCode = startCharCode; charCode <= stopCharCode; ++charCode) {
+      urls.push(url.replace(match[0], String.fromCharCode(charCode)));
+    }
+    return urls;
+  }
+  match = (/\{(\d+)-(\d+)\}/).exec(url);
+  if (match) {
+    // number range
+    var stop_1 = parseInt(match[2], 10);
+    for (var i = parseInt(match[1], 10); i <= stop_1; i++) {
+      urls.push(url.replace(match[0], i.toString()));
+    }
+    return urls;
+  }
+  urls.push(url);
+  return urls;
+}

@@ -1,0 +1,371 @@
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "cloneTransform", function () {
+  return cloneTransform;
+});
+_parcelHelpers.export(exports, "identityTransform", function () {
+  return identityTransform;
+});
+_parcelHelpers.export(exports, "addProjection", function () {
+  return addProjection;
+});
+_parcelHelpers.export(exports, "addProjections", function () {
+  return addProjections;
+});
+_parcelHelpers.export(exports, "get", function () {
+  return get;
+});
+_parcelHelpers.export(exports, "getPointResolution", function () {
+  return getPointResolution;
+});
+_parcelHelpers.export(exports, "addEquivalentProjections", function () {
+  return addEquivalentProjections;
+});
+_parcelHelpers.export(exports, "addEquivalentTransforms", function () {
+  return addEquivalentTransforms;
+});
+_parcelHelpers.export(exports, "clearAllProjections", function () {
+  return clearAllProjections;
+});
+_parcelHelpers.export(exports, "createProjection", function () {
+  return createProjection;
+});
+_parcelHelpers.export(exports, "createTransformFromCoordinateTransform", function () {
+  return createTransformFromCoordinateTransform;
+});
+_parcelHelpers.export(exports, "addCoordinateTransforms", function () {
+  return addCoordinateTransforms;
+});
+_parcelHelpers.export(exports, "fromLonLat", function () {
+  return fromLonLat;
+});
+_parcelHelpers.export(exports, "toLonLat", function () {
+  return toLonLat;
+});
+_parcelHelpers.export(exports, "equivalent", function () {
+  return equivalent;
+});
+_parcelHelpers.export(exports, "getTransformFromProjections", function () {
+  return getTransformFromProjections;
+});
+_parcelHelpers.export(exports, "getTransform", function () {
+  return getTransform;
+});
+_parcelHelpers.export(exports, "transform", function () {
+  return transform;
+});
+_parcelHelpers.export(exports, "transformExtent", function () {
+  return transformExtent;
+});
+_parcelHelpers.export(exports, "transformWithProjections", function () {
+  return transformWithProjections;
+});
+_parcelHelpers.export(exports, "setUserProjection", function () {
+  return setUserProjection;
+});
+_parcelHelpers.export(exports, "clearUserProjection", function () {
+  return clearUserProjection;
+});
+_parcelHelpers.export(exports, "getUserProjection", function () {
+  return getUserProjection;
+});
+_parcelHelpers.export(exports, "useGeographic", function () {
+  return useGeographic;
+});
+_parcelHelpers.export(exports, "toUserCoordinate", function () {
+  return toUserCoordinate;
+});
+_parcelHelpers.export(exports, "fromUserCoordinate", function () {
+  return fromUserCoordinate;
+});
+_parcelHelpers.export(exports, "toUserExtent", function () {
+  return toUserExtent;
+});
+_parcelHelpers.export(exports, "fromUserExtent", function () {
+  return fromUserExtent;
+});
+_parcelHelpers.export(exports, "createSafeCoordinateTransform", function () {
+  return createSafeCoordinateTransform;
+});
+_parcelHelpers.export(exports, "addCommon", function () {
+  return addCommon;
+});
+_parcelHelpers.export(exports, "METERS_PER_UNIT", function () {
+  return _projUnitsJs.METERS_PER_UNIT;
+});
+_parcelHelpers.export(exports, "Projection", function () {
+  return _projProjectionJsDefault.default;
+});
+var _projProjectionJs = require('./proj/Projection.js');
+var _projProjectionJsDefault = _parcelHelpers.interopDefault(_projProjectionJs);
+var _projUnitsJs = require('./proj/Units.js');
+var _projUnitsJsDefault = _parcelHelpers.interopDefault(_projUnitsJs);
+var _projEpsg3857Js = require('./proj/epsg3857.js');
+var _projEpsg4326Js = require('./proj/epsg4326.js');
+var _projProjectionsJs = require('./proj/projections.js');
+var _projTransformsJs = require('./proj/transforms.js');
+var _extentJs = require('./extent.js');
+var _mathJs = require('./math.js');
+var _sphereJs = require('./sphere.js');
+var _coordinateJs = require('./coordinate.js');
+function cloneTransform(input, opt_output, opt_dimension) {
+  var output;
+  if (opt_output !== undefined) {
+    for (var i = 0, ii = input.length; i < ii; ++i) {
+      opt_output[i] = input[i];
+    }
+    output = opt_output;
+  } else {
+    output = input.slice();
+  }
+  return output;
+}
+function identityTransform(input, opt_output, opt_dimension) {
+  if (opt_output !== undefined && input !== opt_output) {
+    for (var i = 0, ii = input.length; i < ii; ++i) {
+      opt_output[i] = input[i];
+    }
+    input = opt_output;
+  }
+  return input;
+}
+function addProjection(projection) {
+  _projProjectionsJs.add(projection.getCode(), projection);
+  _projTransformsJs.add(projection, projection, cloneTransform);
+}
+function addProjections(projections) {
+  projections.forEach(addProjection);
+}
+function get(projectionLike) {
+  return typeof projectionLike === 'string' ? _projProjectionsJs.get(/** @type {string}*/
+  projectionLike) : /** @type {Projection}*/
+  projectionLike || null;
+}
+function getPointResolution(projection, resolution, point, opt_units) {
+  projection = get(projection);
+  var pointResolution;
+  var getter = projection.getPointResolutionFunc();
+  if (getter) {
+    pointResolution = getter(resolution, point);
+    if (opt_units && opt_units !== projection.getUnits()) {
+      var metersPerUnit = projection.getMetersPerUnit();
+      if (metersPerUnit) {
+        pointResolution = pointResolution * metersPerUnit / _projUnitsJs.METERS_PER_UNIT[opt_units];
+      }
+    }
+  } else {
+    var units = projection.getUnits();
+    if (units == _projUnitsJsDefault.default.DEGREES && !opt_units || opt_units == _projUnitsJsDefault.default.DEGREES) {
+      pointResolution = resolution;
+    } else {
+      // Estimate point resolution by transforming the center pixel to EPSG:4326,
+      // measuring its width and height on the normal sphere, and taking the
+      // average of the width and height.
+      var toEPSG4326_1 = getTransformFromProjections(projection, get('EPSG:4326'));
+      if (toEPSG4326_1 === identityTransform && units !== _projUnitsJsDefault.default.DEGREES) {
+        // no transform is available
+        pointResolution = resolution * projection.getMetersPerUnit();
+      } else {
+        var vertices = [point[0] - resolution / 2, point[1], point[0] + resolution / 2, point[1], point[0], point[1] - resolution / 2, point[0], point[1] + resolution / 2];
+        vertices = toEPSG4326_1(vertices, vertices, 2);
+        var width = _sphereJs.getDistance(vertices.slice(0, 2), vertices.slice(2, 4));
+        var height = _sphereJs.getDistance(vertices.slice(4, 6), vertices.slice(6, 8));
+        pointResolution = (width + height) / 2;
+      }
+      var metersPerUnit = opt_units ? _projUnitsJs.METERS_PER_UNIT[opt_units] : projection.getMetersPerUnit();
+      if (metersPerUnit !== undefined) {
+        pointResolution /= metersPerUnit;
+      }
+    }
+  }
+  return pointResolution;
+}
+function addEquivalentProjections(projections) {
+  addProjections(projections);
+  projections.forEach(function (source) {
+    projections.forEach(function (destination) {
+      if (source !== destination) {
+        _projTransformsJs.add(source, destination, cloneTransform);
+      }
+    });
+  });
+}
+function addEquivalentTransforms(projections1, projections2, forwardTransform, inverseTransform) {
+  projections1.forEach(function (projection1) {
+    projections2.forEach(function (projection2) {
+      _projTransformsJs.add(projection1, projection2, forwardTransform);
+      _projTransformsJs.add(projection2, projection1, inverseTransform);
+    });
+  });
+}
+function clearAllProjections() {
+  _projProjectionsJs.clear();
+  _projTransformsJs.clear();
+}
+function createProjection(projection, defaultCode) {
+  if (!projection) {
+    return get(defaultCode);
+  } else if (typeof projection === 'string') {
+    return get(projection);
+  } else {
+    return (
+      /** @type {Projection}*/
+      projection
+    );
+  }
+}
+function createTransformFromCoordinateTransform(coordTransform) {
+  return (
+    /**
+    * @param {Array<number>} input Input.
+    * @param {Array<number>=} opt_output Output.
+    * @param {number=} opt_dimension Dimension.
+    * @return {Array<number>} Output.
+    */
+    function (input, opt_output, opt_dimension) {
+      var length = input.length;
+      var dimension = opt_dimension !== undefined ? opt_dimension : 2;
+      var output = opt_output !== undefined ? opt_output : new Array(length);
+      for (var i = 0; i < length; i += dimension) {
+        var point = coordTransform([input[i], input[i + 1]]);
+        output[i] = point[0];
+        output[i + 1] = point[1];
+        for (var j = dimension - 1; j >= 2; --j) {
+          output[i + j] = input[i + j];
+        }
+      }
+      return output;
+    }
+  );
+}
+function addCoordinateTransforms(source, destination, forward, inverse) {
+  var sourceProj = get(source);
+  var destProj = get(destination);
+  _projTransformsJs.add(sourceProj, destProj, createTransformFromCoordinateTransform(forward));
+  _projTransformsJs.add(destProj, sourceProj, createTransformFromCoordinateTransform(inverse));
+}
+function fromLonLat(coordinate, opt_projection) {
+  return transform(coordinate, 'EPSG:4326', opt_projection !== undefined ? opt_projection : 'EPSG:3857');
+}
+function toLonLat(coordinate, opt_projection) {
+  var lonLat = transform(coordinate, opt_projection !== undefined ? opt_projection : 'EPSG:3857', 'EPSG:4326');
+  var lon = lonLat[0];
+  if (lon < -180 || lon > 180) {
+    lonLat[0] = _mathJs.modulo(lon + 180, 360) - 180;
+  }
+  return lonLat;
+}
+function equivalent(projection1, projection2) {
+  if (projection1 === projection2) {
+    return true;
+  }
+  var equalUnits = projection1.getUnits() === projection2.getUnits();
+  if (projection1.getCode() === projection2.getCode()) {
+    return equalUnits;
+  } else {
+    var transformFunc = getTransformFromProjections(projection1, projection2);
+    return transformFunc === cloneTransform && equalUnits;
+  }
+}
+function getTransformFromProjections(sourceProjection, destinationProjection) {
+  var sourceCode = sourceProjection.getCode();
+  var destinationCode = destinationProjection.getCode();
+  var transformFunc = _projTransformsJs.get(sourceCode, destinationCode);
+  if (!transformFunc) {
+    transformFunc = identityTransform;
+  }
+  return transformFunc;
+}
+function getTransform(source, destination) {
+  var sourceProjection = get(source);
+  var destinationProjection = get(destination);
+  return getTransformFromProjections(sourceProjection, destinationProjection);
+}
+function transform(coordinate, source, destination) {
+  var transformFunc = getTransform(source, destination);
+  return transformFunc(coordinate, undefined, coordinate.length);
+}
+function transformExtent(extent, source, destination, opt_stops) {
+  var transformFunc = getTransform(source, destination);
+  return _extentJs.applyTransform(extent, transformFunc, undefined, opt_stops);
+}
+function transformWithProjections(point, sourceProjection, destinationProjection) {
+  var transformFunc = getTransformFromProjections(sourceProjection, destinationProjection);
+  return transformFunc(point);
+}
+/**
+* @type {?Projection}
+*/
+var userProjection = null;
+function setUserProjection(projection) {
+  userProjection = get(projection);
+}
+function clearUserProjection() {
+  userProjection = null;
+}
+function getUserProjection() {
+  return userProjection;
+}
+function useGeographic() {
+  setUserProjection('EPSG:4326');
+}
+function toUserCoordinate(coordinate, sourceProjection) {
+  if (!userProjection) {
+    return coordinate;
+  }
+  return transform(coordinate, sourceProjection, userProjection);
+}
+function fromUserCoordinate(coordinate, destProjection) {
+  if (!userProjection) {
+    return coordinate;
+  }
+  return transform(coordinate, userProjection, destProjection);
+}
+function toUserExtent(extent, sourceProjection) {
+  if (!userProjection) {
+    return extent;
+  }
+  return transformExtent(extent, sourceProjection, userProjection);
+}
+function fromUserExtent(extent, destProjection) {
+  if (!userProjection) {
+    return extent;
+  }
+  return transformExtent(extent, userProjection, destProjection);
+}
+function createSafeCoordinateTransform(sourceProj, destProj, transform) {
+  return function (coord) {
+    var sourceX = coord[0];
+    var sourceY = coord[1];
+    var transformed, worldsAway;
+    if (sourceProj.canWrapX()) {
+      var sourceExtent = sourceProj.getExtent();
+      var sourceExtentWidth = _extentJs.getWidth(sourceExtent);
+      worldsAway = _coordinateJs.getWorldsAway(coord, sourceProj, sourceExtentWidth);
+      if (worldsAway) {
+        // Move x to the real world
+        sourceX = sourceX - worldsAway * sourceExtentWidth;
+      }
+      sourceX = _mathJs.clamp(sourceX, sourceExtent[0], sourceExtent[2]);
+      sourceY = _mathJs.clamp(sourceY, sourceExtent[1], sourceExtent[3]);
+      transformed = transform([sourceX, sourceY]);
+    } else {
+      transformed = transform(coord);
+    }
+    if (worldsAway && destProj.canWrapX()) {
+      // Move transformed coordinate back to the offset world
+      transformed[0] += worldsAway * _extentJs.getWidth(destProj.getExtent());
+    }
+    return transformed;
+  };
+}
+function addCommon() {
+  // Add transformations that don't alter coordinates to convert within set of
+  // projections with equal meaning.
+  addEquivalentProjections(_projEpsg3857Js.PROJECTIONS);
+  addEquivalentProjections(_projEpsg4326Js.PROJECTIONS);
+  // Add transformations to convert EPSG:4326 like coordinates to EPSG:3857 like
+  // coordinates and back.
+  addEquivalentTransforms(_projEpsg4326Js.PROJECTIONS, _projEpsg3857Js.PROJECTIONS, _projEpsg3857Js.fromEPSG4326, _projEpsg3857Js.toEPSG4326);
+}
+addCommon();

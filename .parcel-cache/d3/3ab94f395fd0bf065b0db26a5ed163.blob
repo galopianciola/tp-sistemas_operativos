@@ -1,0 +1,313 @@
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "defaultFont", function () {
+  return defaultFont;
+});
+_parcelHelpers.export(exports, "defaultFillStyle", function () {
+  return defaultFillStyle;
+});
+_parcelHelpers.export(exports, "defaultLineCap", function () {
+  return defaultLineCap;
+});
+_parcelHelpers.export(exports, "defaultLineDash", function () {
+  return defaultLineDash;
+});
+_parcelHelpers.export(exports, "defaultLineDashOffset", function () {
+  return defaultLineDashOffset;
+});
+_parcelHelpers.export(exports, "defaultLineJoin", function () {
+  return defaultLineJoin;
+});
+_parcelHelpers.export(exports, "defaultMiterLimit", function () {
+  return defaultMiterLimit;
+});
+_parcelHelpers.export(exports, "defaultStrokeStyle", function () {
+  return defaultStrokeStyle;
+});
+_parcelHelpers.export(exports, "defaultTextAlign", function () {
+  return defaultTextAlign;
+});
+_parcelHelpers.export(exports, "defaultTextBaseline", function () {
+  return defaultTextBaseline;
+});
+_parcelHelpers.export(exports, "defaultPadding", function () {
+  return defaultPadding;
+});
+_parcelHelpers.export(exports, "defaultLineWidth", function () {
+  return defaultLineWidth;
+});
+_parcelHelpers.export(exports, "checkedFonts", function () {
+  return checkedFonts;
+});
+_parcelHelpers.export(exports, "labelCache", function () {
+  return labelCache;
+});
+_parcelHelpers.export(exports, "textHeights", function () {
+  return textHeights;
+});
+_parcelHelpers.export(exports, "registerFont", function () {
+  return registerFont;
+});
+_parcelHelpers.export(exports, "measureTextHeight", function () {
+  return measureTextHeight;
+});
+_parcelHelpers.export(exports, "measureTextWidth", function () {
+  return measureTextWidth;
+});
+_parcelHelpers.export(exports, "measureAndCacheTextWidth", function () {
+  return measureAndCacheTextWidth;
+});
+_parcelHelpers.export(exports, "measureTextWidths", function () {
+  return measureTextWidths;
+});
+_parcelHelpers.export(exports, "rotateAtOffset", function () {
+  return rotateAtOffset;
+});
+_parcelHelpers.export(exports, "drawImageOrLabel", function () {
+  return drawImageOrLabel;
+});
+_parcelHelpers.export(exports, "createTransformString", function () {
+  return createTransformString;
+});
+var _ObjectJs = require('../Object.js');
+var _ObjectJsDefault = _parcelHelpers.interopDefault(_ObjectJs);
+var _eventsTargetJs = require('../events/Target.js');
+var _eventsTargetJsDefault = _parcelHelpers.interopDefault(_eventsTargetJs);
+var _hasJs = require('../has.js');
+var _objJs = require('../obj.js');
+var _domJs = require('../dom.js');
+var _cssJs = require('../css.js');
+var _transformJs = require('../transform.js');
+var defaultFont = '10px sans-serif';
+var defaultFillStyle = '#000';
+var defaultLineCap = 'round';
+var defaultLineDash = [];
+var defaultLineDashOffset = 0;
+var defaultLineJoin = 'round';
+var defaultMiterLimit = 10;
+var defaultStrokeStyle = '#000';
+var defaultTextAlign = 'center';
+var defaultTextBaseline = 'middle';
+var defaultPadding = [0, 0, 0, 0];
+var defaultLineWidth = 1;
+var checkedFonts = new _ObjectJsDefault.default();
+var labelCache = new _eventsTargetJsDefault.default();
+labelCache.setSize = function () {
+  console.warn('labelCache is deprecated.');
+};
+/**
+* @type {CanvasRenderingContext2D}
+*/
+var measureContext = null;
+/**
+* @type {string}
+*/
+var measureFont;
+var textHeights = {};
+var registerFont = (function () {
+  var retries = 100;
+  var size = '32px ';
+  var referenceFonts = ['monospace', 'serif'];
+  var len = referenceFonts.length;
+  var text = 'wmytzilWMYTZIL@#/&?$%10\uF013';
+  var interval, referenceWidth;
+  /**
+  * @param {string} fontStyle Css font-style
+  * @param {string} fontWeight Css font-weight
+  * @param {*} fontFamily Css font-family
+  * @return {boolean} Font with style and weight is available
+  */
+  function isAvailable(fontStyle, fontWeight, fontFamily) {
+    var available = true;
+    for (var i = 0; i < len; ++i) {
+      var referenceFont = referenceFonts[i];
+      referenceWidth = measureTextWidth(fontStyle + ' ' + fontWeight + ' ' + size + referenceFont, text);
+      if (fontFamily != referenceFont) {
+        var width = measureTextWidth(fontStyle + ' ' + fontWeight + ' ' + size + fontFamily + ',' + referenceFont, text);
+        // If width and referenceWidth are the same, then the fallback was used
+        // instead of the font we wanted, so the font is not available.
+        available = available && width != referenceWidth;
+      }
+    }
+    if (available) {
+      return true;
+    }
+    return false;
+  }
+  function check() {
+    var done = true;
+    var fonts = checkedFonts.getKeys();
+    for (var i = 0, ii = fonts.length; i < ii; ++i) {
+      var font = fonts[i];
+      if (checkedFonts.get(font) < retries) {
+        if (isAvailable.apply(this, font.split('\n'))) {
+          _objJs.clear(textHeights);
+          // Make sure that loaded fonts are picked up by Safari
+          measureContext = null;
+          measureFont = undefined;
+          checkedFonts.set(font, retries);
+        } else {
+          checkedFonts.set(font, checkedFonts.get(font) + 1, true);
+          done = false;
+        }
+      }
+    }
+    if (done) {
+      clearInterval(interval);
+      interval = undefined;
+    }
+  }
+  return function (fontSpec) {
+    var font = _cssJs.getFontParameters(fontSpec);
+    if (!font) {
+      return;
+    }
+    var families = font.families;
+    for (var i = 0, ii = families.length; i < ii; ++i) {
+      var family = families[i];
+      var key = font.style + '\n' + font.weight + '\n' + family;
+      if (checkedFonts.get(key) === undefined) {
+        checkedFonts.set(key, retries, true);
+        if (!isAvailable(font.style, font.weight, family)) {
+          checkedFonts.set(key, 0, true);
+          if (interval === undefined) {
+            interval = setInterval(check, 32);
+          }
+        }
+      }
+    }
+  };
+})();
+var measureTextHeight = (function () {
+  /**
+  * @type {HTMLDivElement}
+  */
+  var div;
+  return function (fontSpec) {
+    var height = textHeights[fontSpec];
+    if (height == undefined) {
+      if (_hasJs.WORKER_OFFSCREEN_CANVAS) {
+        var font = _cssJs.getFontParameters(fontSpec);
+        var metrics = measureText(fontSpec, 'Žg');
+        var lineHeight = isNaN(Number(font.lineHeight)) ? 1.2 : Number(font.lineHeight);
+        height = lineHeight * (metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent);
+      } else {
+        if (!div) {
+          div = document.createElement('div');
+          div.innerHTML = 'M';
+          div.style.margin = '0 !important';
+          div.style.padding = '0 !important';
+          div.style.position = 'absolute !important';
+          div.style.left = '-99999px !important';
+        }
+        div.style.font = fontSpec;
+        document.body.appendChild(div);
+        height = div.offsetHeight;
+        document.body.removeChild(div);
+      }
+      textHeights[fontSpec] = height;
+    }
+    return height;
+  };
+})();
+/**
+* @param {string} font Font.
+* @param {string} text Text.
+* @return {TextMetrics} Text metrics.
+*/
+function measureText(font, text) {
+  if (!measureContext) {
+    measureContext = _domJs.createCanvasContext2D(1, 1);
+  }
+  if (font != measureFont) {
+    measureContext.font = font;
+    measureFont = measureContext.font;
+  }
+  return measureContext.measureText(text);
+}
+function measureTextWidth(font, text) {
+  return measureText(font, text).width;
+}
+function measureAndCacheTextWidth(font, text, cache) {
+  if ((text in cache)) {
+    return cache[text];
+  }
+  var width = measureTextWidth(font, text);
+  cache[text] = width;
+  return width;
+}
+function measureTextWidths(font, lines, widths) {
+  var numLines = lines.length;
+  var width = 0;
+  for (var i = 0; i < numLines; ++i) {
+    var currentWidth = measureTextWidth(font, lines[i]);
+    width = Math.max(width, currentWidth);
+    widths.push(currentWidth);
+  }
+  return width;
+}
+function rotateAtOffset(context, rotation, offsetX, offsetY) {
+  if (rotation !== 0) {
+    context.translate(offsetX, offsetY);
+    context.rotate(rotation);
+    context.translate(-offsetX, -offsetY);
+  }
+}
+function drawImageOrLabel(context, transform, opacity, labelOrImage, originX, originY, w, h, x, y, scale) {
+  context.save();
+  if (opacity !== 1) {
+    context.globalAlpha *= opacity;
+  }
+  if (transform) {
+    context.setTransform.apply(context, transform);
+  }
+  if (/** @type {*}*/
+  labelOrImage.contextInstructions) {
+    // label
+    context.translate(x, y);
+    context.scale(scale[0], scale[1]);
+    executeLabelInstructions(/** @type {Label}*/
+    labelOrImage, context);
+  } else if (scale[0] < 0 || scale[1] < 0) {
+    // flipped image
+    context.translate(x, y);
+    context.scale(scale[0], scale[1]);
+    context.drawImage(/** @type {HTMLCanvasElement|HTMLImageElement|HTMLVideoElement}*/
+    labelOrImage, originX, originY, w, h, 0, 0, w, h);
+  } else {
+    // if image not flipped translate and scale can be avoided
+    context.drawImage(/** @type {HTMLCanvasElement|HTMLImageElement|HTMLVideoElement}*/
+    labelOrImage, originX, originY, w, h, x, y, w * scale[0], h * scale[1]);
+  }
+  context.restore();
+}
+/**
+* @param {Label} label Label.
+* @param {CanvasRenderingContext2D} context Context.
+*/
+function executeLabelInstructions(label, context) {
+  var contextInstructions = label.contextInstructions;
+  for (var i = 0, ii = contextInstructions.length; i < ii; i += 2) {
+    if (Array.isArray(contextInstructions[i + 1])) {
+      context[contextInstructions[i]].apply(context, contextInstructions[i + 1]);
+    } else {
+      context[contextInstructions[i]] = contextInstructions[i + 1];
+    }
+  }
+}
+/**
+* @type {HTMLCanvasElement}
+* @private
+*/
+var createTransformStringCanvas = null;
+function createTransformString(transform) {
+  if (_hasJs.WORKER_OFFSCREEN_CANVAS) {
+    return _transformJs.toString(transform);
+  } else {
+    if (!createTransformStringCanvas) {
+      createTransformStringCanvas = _domJs.createCanvasContext2D(1, 1).canvas;
+    }
+    createTransformStringCanvas.style.transform = _transformJs.toString(transform);
+    return createTransformStringCanvas.style.transform;
+  }
+}

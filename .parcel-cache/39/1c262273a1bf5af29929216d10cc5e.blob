@@ -1,0 +1,96 @@
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+var _BuilderJs = require('./Builder.js');
+var _BuilderJsDefault = _parcelHelpers.interopDefault(_BuilderJs);
+var _ImageBuilderJs = require('./ImageBuilder.js');
+var _ImageBuilderJsDefault = _parcelHelpers.interopDefault(_ImageBuilderJs);
+var _LineStringBuilderJs = require('./LineStringBuilder.js');
+var _LineStringBuilderJsDefault = _parcelHelpers.interopDefault(_LineStringBuilderJs);
+var _PolygonBuilderJs = require('./PolygonBuilder.js');
+var _PolygonBuilderJsDefault = _parcelHelpers.interopDefault(_PolygonBuilderJs);
+var _TextBuilderJs = require('./TextBuilder.js');
+var _TextBuilderJsDefault = _parcelHelpers.interopDefault(_TextBuilderJs);
+/**
+* @type {Object<import("./BuilderType").default, typeof Builder>}
+*/
+var BATCH_CONSTRUCTORS = {
+  'Circle': _PolygonBuilderJsDefault.default,
+  'Default': _BuilderJsDefault.default,
+  'Image': _ImageBuilderJsDefault.default,
+  'LineString': _LineStringBuilderJsDefault.default,
+  'Polygon': _PolygonBuilderJsDefault.default,
+  'Text': _TextBuilderJsDefault.default
+};
+var BuilderGroup = /** @class*/
+(function () {
+  /**
+  * @param {number} tolerance Tolerance.
+  * @param {import("../../extent.js").Extent} maxExtent Max extent.
+  * @param {number} resolution Resolution.
+  * @param {number} pixelRatio Pixel ratio.
+  */
+  function BuilderGroup(tolerance, maxExtent, resolution, pixelRatio) {
+    /**
+    * @private
+    * @type {number}
+    */
+    this.tolerance_ = tolerance;
+    /**
+    * @private
+    * @type {import("../../extent.js").Extent}
+    */
+    this.maxExtent_ = maxExtent;
+    /**
+    * @private
+    * @type {number}
+    */
+    this.pixelRatio_ = pixelRatio;
+    /**
+    * @private
+    * @type {number}
+    */
+    this.resolution_ = resolution;
+    /**
+    * @private
+    * @type {!Object<string, !Object<import("./BuilderType").default, Builder>>}
+    */
+    this.buildersByZIndex_ = {};
+  }
+  /**
+  * @return {!Object<string, !Object<import("./BuilderType").default, import("./Builder.js").SerializableInstructions>>} The serializable instructions
+  */
+  BuilderGroup.prototype.finish = function () {
+    var builderInstructions = {};
+    for (var zKey in this.buildersByZIndex_) {
+      builderInstructions[zKey] = builderInstructions[zKey] || ({});
+      var builders = this.buildersByZIndex_[zKey];
+      for (var builderKey in builders) {
+        var builderInstruction = builders[builderKey].finish();
+        builderInstructions[zKey][builderKey] = builderInstruction;
+      }
+    }
+    return builderInstructions;
+  };
+  /**
+  * @param {number|undefined} zIndex Z index.
+  * @param {import("./BuilderType.js").default} builderType Replay type.
+  * @return {import("../VectorContext.js").default} Replay.
+  */
+  BuilderGroup.prototype.getBuilder = function (zIndex, builderType) {
+    var zIndexKey = zIndex !== undefined ? zIndex.toString() : '0';
+    var replays = this.buildersByZIndex_[zIndexKey];
+    if (replays === undefined) {
+      replays = {};
+      this.buildersByZIndex_[zIndexKey] = replays;
+    }
+    var replay = replays[builderType];
+    if (replay === undefined) {
+      var Constructor = BATCH_CONSTRUCTORS[builderType];
+      replay = new Constructor(this.tolerance_, this.maxExtent_, this.resolution_, this.pixelRatio_);
+      replays[builderType] = replay;
+    }
+    return replay;
+  };
+  return BuilderGroup;
+})();
+exports.default = BuilderGroup;

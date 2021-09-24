@@ -1,0 +1,77 @@
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "defaults", function () {
+  return defaults;
+});
+_parcelHelpers.export(exports, "Attribution", function () {
+  return _controlAttributionJsDefault.default;
+});
+_parcelHelpers.export(exports, "Control", function () {
+  return _controlControlJsDefault.default;
+});
+_parcelHelpers.export(exports, "FullScreen", function () {
+  return _controlFullScreenJsDefault.default;
+});
+_parcelHelpers.export(exports, "MousePosition", function () {
+  return _controlMousePositionJsDefault.default;
+});
+_parcelHelpers.export(exports, "OverviewMap", function () {
+  return _controlOverviewMapJsDefault.default;
+});
+_parcelHelpers.export(exports, "Rotate", function () {
+  return _controlRotateJsDefault.default;
+});
+_parcelHelpers.export(exports, "ScaleLine", function () {
+  return _controlScaleLineJsDefault.default;
+});
+_parcelHelpers.export(exports, "Zoom", function () {
+  return _controlZoomJsDefault.default;
+});
+_parcelHelpers.export(exports, "ZoomSlider", function () {
+  return _controlZoomSliderJsDefault.default;
+});
+_parcelHelpers.export(exports, "ZoomToExtent", function () {
+  return _controlZoomToExtentJsDefault.default;
+});
+var _controlAttributionJs = require('./control/Attribution.js');
+var _controlAttributionJsDefault = _parcelHelpers.interopDefault(_controlAttributionJs);
+var _CollectionJs = require('./Collection.js');
+var _CollectionJsDefault = _parcelHelpers.interopDefault(_CollectionJs);
+var _controlRotateJs = require('./control/Rotate.js');
+var _controlRotateJsDefault = _parcelHelpers.interopDefault(_controlRotateJs);
+var _controlZoomJs = require('./control/Zoom.js');
+var _controlZoomJsDefault = _parcelHelpers.interopDefault(_controlZoomJs);
+var _controlAttributionJsDefault = _parcelHelpers.interopDefault(_controlAttributionJs);
+var _controlControlJs = require('./control/Control.js');
+var _controlControlJsDefault = _parcelHelpers.interopDefault(_controlControlJs);
+var _controlFullScreenJs = require('./control/FullScreen.js');
+var _controlFullScreenJsDefault = _parcelHelpers.interopDefault(_controlFullScreenJs);
+var _controlMousePositionJs = require('./control/MousePosition.js');
+var _controlMousePositionJsDefault = _parcelHelpers.interopDefault(_controlMousePositionJs);
+var _controlOverviewMapJs = require('./control/OverviewMap.js');
+var _controlOverviewMapJsDefault = _parcelHelpers.interopDefault(_controlOverviewMapJs);
+var _controlRotateJsDefault = _parcelHelpers.interopDefault(_controlRotateJs);
+var _controlScaleLineJs = require('./control/ScaleLine.js');
+var _controlScaleLineJsDefault = _parcelHelpers.interopDefault(_controlScaleLineJs);
+var _controlZoomJsDefault = _parcelHelpers.interopDefault(_controlZoomJs);
+var _controlZoomSliderJs = require('./control/ZoomSlider.js');
+var _controlZoomSliderJsDefault = _parcelHelpers.interopDefault(_controlZoomSliderJs);
+var _controlZoomToExtentJs = require('./control/ZoomToExtent.js');
+var _controlZoomToExtentJsDefault = _parcelHelpers.interopDefault(_controlZoomToExtentJs);
+function defaults(opt_options) {
+  var options = opt_options ? opt_options : {};
+  var controls = new _CollectionJsDefault.default();
+  var zoomControl = options.zoom !== undefined ? options.zoom : true;
+  if (zoomControl) {
+    controls.push(new _controlZoomJsDefault.default(options.zoomOptions));
+  }
+  var rotateControl = options.rotate !== undefined ? options.rotate : true;
+  if (rotateControl) {
+    controls.push(new _controlRotateJsDefault.default(options.rotateOptions));
+  }
+  var attributionControl = options.attribution !== undefined ? options.attribution : true;
+  if (attributionControl) {
+    controls.push(new _controlAttributionJsDefault.default(options.attributionOptions));
+  }
+  return controls;
+}

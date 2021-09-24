@@ -1,0 +1,173 @@
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "defaults", function () {
+  return defaults;
+});
+_parcelHelpers.export(exports, "DoubleClickZoom", function () {
+  return _interactionDoubleClickZoomJsDefault.default;
+});
+_parcelHelpers.export(exports, "DragAndDrop", function () {
+  return _interactionDragAndDropJsDefault.default;
+});
+_parcelHelpers.export(exports, "DragBox", function () {
+  return _interactionDragBoxJsDefault.default;
+});
+_parcelHelpers.export(exports, "DragPan", function () {
+  return _interactionDragPanJsDefault.default;
+});
+_parcelHelpers.export(exports, "DragRotate", function () {
+  return _interactionDragRotateJsDefault.default;
+});
+_parcelHelpers.export(exports, "DragRotateAndZoom", function () {
+  return _interactionDragRotateAndZoomJsDefault.default;
+});
+_parcelHelpers.export(exports, "DragZoom", function () {
+  return _interactionDragZoomJsDefault.default;
+});
+_parcelHelpers.export(exports, "Draw", function () {
+  return _interactionDrawJsDefault.default;
+});
+_parcelHelpers.export(exports, "Extent", function () {
+  return _interactionExtentJsDefault.default;
+});
+_parcelHelpers.export(exports, "Interaction", function () {
+  return _interactionInteractionJsDefault.default;
+});
+_parcelHelpers.export(exports, "KeyboardPan", function () {
+  return _interactionKeyboardPanJsDefault.default;
+});
+_parcelHelpers.export(exports, "KeyboardZoom", function () {
+  return _interactionKeyboardZoomJsDefault.default;
+});
+_parcelHelpers.export(exports, "Modify", function () {
+  return _interactionModifyJsDefault.default;
+});
+_parcelHelpers.export(exports, "MouseWheelZoom", function () {
+  return _interactionMouseWheelZoomJsDefault.default;
+});
+_parcelHelpers.export(exports, "PinchRotate", function () {
+  return _interactionPinchRotateJsDefault.default;
+});
+_parcelHelpers.export(exports, "PinchZoom", function () {
+  return _interactionPinchZoomJsDefault.default;
+});
+_parcelHelpers.export(exports, "Pointer", function () {
+  return _interactionPointerJsDefault.default;
+});
+_parcelHelpers.export(exports, "Select", function () {
+  return _interactionSelectJsDefault.default;
+});
+_parcelHelpers.export(exports, "Snap", function () {
+  return _interactionSnapJsDefault.default;
+});
+_parcelHelpers.export(exports, "Translate", function () {
+  return _interactionTranslateJsDefault.default;
+});
+var _CollectionJs = require('./Collection.js');
+var _CollectionJsDefault = _parcelHelpers.interopDefault(_CollectionJs);
+var _interactionDoubleClickZoomJs = require('./interaction/DoubleClickZoom.js');
+var _interactionDoubleClickZoomJsDefault = _parcelHelpers.interopDefault(_interactionDoubleClickZoomJs);
+var _interactionDragPanJs = require('./interaction/DragPan.js');
+var _interactionDragPanJsDefault = _parcelHelpers.interopDefault(_interactionDragPanJs);
+var _interactionDragRotateJs = require('./interaction/DragRotate.js');
+var _interactionDragRotateJsDefault = _parcelHelpers.interopDefault(_interactionDragRotateJs);
+var _interactionDragZoomJs = require('./interaction/DragZoom.js');
+var _interactionDragZoomJsDefault = _parcelHelpers.interopDefault(_interactionDragZoomJs);
+var _interactionKeyboardPanJs = require('./interaction/KeyboardPan.js');
+var _interactionKeyboardPanJsDefault = _parcelHelpers.interopDefault(_interactionKeyboardPanJs);
+var _interactionKeyboardZoomJs = require('./interaction/KeyboardZoom.js');
+var _interactionKeyboardZoomJsDefault = _parcelHelpers.interopDefault(_interactionKeyboardZoomJs);
+var _KineticJs = require('./Kinetic.js');
+var _KineticJsDefault = _parcelHelpers.interopDefault(_KineticJs);
+var _interactionMouseWheelZoomJs = require('./interaction/MouseWheelZoom.js');
+var _interactionMouseWheelZoomJsDefault = _parcelHelpers.interopDefault(_interactionMouseWheelZoomJs);
+var _interactionPinchRotateJs = require('./interaction/PinchRotate.js');
+var _interactionPinchRotateJsDefault = _parcelHelpers.interopDefault(_interactionPinchRotateJs);
+var _interactionPinchZoomJs = require('./interaction/PinchZoom.js');
+var _interactionPinchZoomJsDefault = _parcelHelpers.interopDefault(_interactionPinchZoomJs);
+var _interactionDoubleClickZoomJsDefault = _parcelHelpers.interopDefault(_interactionDoubleClickZoomJs);
+var _interactionDragAndDropJs = require('./interaction/DragAndDrop.js');
+var _interactionDragAndDropJsDefault = _parcelHelpers.interopDefault(_interactionDragAndDropJs);
+var _interactionDragBoxJs = require('./interaction/DragBox.js');
+var _interactionDragBoxJsDefault = _parcelHelpers.interopDefault(_interactionDragBoxJs);
+var _interactionDragPanJsDefault = _parcelHelpers.interopDefault(_interactionDragPanJs);
+var _interactionDragRotateJsDefault = _parcelHelpers.interopDefault(_interactionDragRotateJs);
+var _interactionDragRotateAndZoomJs = require('./interaction/DragRotateAndZoom.js');
+var _interactionDragRotateAndZoomJsDefault = _parcelHelpers.interopDefault(_interactionDragRotateAndZoomJs);
+var _interactionDragZoomJsDefault = _parcelHelpers.interopDefault(_interactionDragZoomJs);
+var _interactionDrawJs = require('./interaction/Draw.js');
+var _interactionDrawJsDefault = _parcelHelpers.interopDefault(_interactionDrawJs);
+var _interactionExtentJs = require('./interaction/Extent.js');
+var _interactionExtentJsDefault = _parcelHelpers.interopDefault(_interactionExtentJs);
+var _interactionInteractionJs = require('./interaction/Interaction.js');
+var _interactionInteractionJsDefault = _parcelHelpers.interopDefault(_interactionInteractionJs);
+var _interactionKeyboardPanJsDefault = _parcelHelpers.interopDefault(_interactionKeyboardPanJs);
+var _interactionKeyboardZoomJsDefault = _parcelHelpers.interopDefault(_interactionKeyboardZoomJs);
+var _interactionModifyJs = require('./interaction/Modify.js');
+var _interactionModifyJsDefault = _parcelHelpers.interopDefault(_interactionModifyJs);
+var _interactionMouseWheelZoomJsDefault = _parcelHelpers.interopDefault(_interactionMouseWheelZoomJs);
+var _interactionPinchRotateJsDefault = _parcelHelpers.interopDefault(_interactionPinchRotateJs);
+var _interactionPinchZoomJsDefault = _parcelHelpers.interopDefault(_interactionPinchZoomJs);
+var _interactionPointerJs = require('./interaction/Pointer.js');
+var _interactionPointerJsDefault = _parcelHelpers.interopDefault(_interactionPointerJs);
+var _interactionSelectJs = require('./interaction/Select.js');
+var _interactionSelectJsDefault = _parcelHelpers.interopDefault(_interactionSelectJs);
+var _interactionSnapJs = require('./interaction/Snap.js');
+var _interactionSnapJsDefault = _parcelHelpers.interopDefault(_interactionSnapJs);
+var _interactionTranslateJs = require('./interaction/Translate.js');
+var _interactionTranslateJsDefault = _parcelHelpers.interopDefault(_interactionTranslateJs);
+function defaults(opt_options) {
+  var options = opt_options ? opt_options : {};
+  var interactions = new _CollectionJsDefault.default();
+  var kinetic = new _KineticJsDefault.default(-0.005, 0.05, 100);
+  var altShiftDragRotate = options.altShiftDragRotate !== undefined ? options.altShiftDragRotate : true;
+  if (altShiftDragRotate) {
+    interactions.push(new _interactionDragRotateJsDefault.default());
+  }
+  var doubleClickZoom = options.doubleClickZoom !== undefined ? options.doubleClickZoom : true;
+  if (doubleClickZoom) {
+    interactions.push(new _interactionDoubleClickZoomJsDefault.default({
+      delta: options.zoomDelta,
+      duration: options.zoomDuration
+    }));
+  }
+  var dragPan = options.dragPan !== undefined ? options.dragPan : true;
+  if (dragPan) {
+    interactions.push(new _interactionDragPanJsDefault.default({
+      onFocusOnly: options.onFocusOnly,
+      kinetic: kinetic
+    }));
+  }
+  var pinchRotate = options.pinchRotate !== undefined ? options.pinchRotate : true;
+  if (pinchRotate) {
+    interactions.push(new _interactionPinchRotateJsDefault.default());
+  }
+  var pinchZoom = options.pinchZoom !== undefined ? options.pinchZoom : true;
+  if (pinchZoom) {
+    interactions.push(new _interactionPinchZoomJsDefault.default({
+      duration: options.zoomDuration
+    }));
+  }
+  var keyboard = options.keyboard !== undefined ? options.keyboard : true;
+  if (keyboard) {
+    interactions.push(new _interactionKeyboardPanJsDefault.default());
+    interactions.push(new _interactionKeyboardZoomJsDefault.default({
+      delta: options.zoomDelta,
+      duration: options.zoomDuration
+    }));
+  }
+  var mouseWheelZoom = options.mouseWheelZoom !== undefined ? options.mouseWheelZoom : true;
+  if (mouseWheelZoom) {
+    interactions.push(new _interactionMouseWheelZoomJsDefault.default({
+      onFocusOnly: options.onFocusOnly,
+      duration: options.zoomDuration
+    }));
+  }
+  var shiftDragZoom = options.shiftDragZoom !== undefined ? options.shiftDragZoom : true;
+  if (shiftDragZoom) {
+    interactions.push(new _interactionDragZoomJsDefault.default({
+      duration: options.zoomDuration
+    }));
+  }
+  return interactions;
+}

@@ -1,0 +1,254 @@
+require('ol/ol.css');
+require('ol-geocoder/dist/ol-geocoder.css');
+var _olMap = require('ol/Map');
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+var _olMapDefault = _parcelHelpers.interopDefault(_olMap);
+var _olView = require('ol/View');
+var _olViewDefault = _parcelHelpers.interopDefault(_olView);
+var _olFormatMVT = require('ol/format/MVT');
+var _olFormatMVTDefault = _parcelHelpers.interopDefault(_olFormatMVT);
+var _olLayerTile = require('ol/layer/Tile');
+var _olLayerTileDefault = _parcelHelpers.interopDefault(_olLayerTile);
+var _olLayerVectorTile = require('ol/layer/VectorTile');
+var _olLayerVectorTileDefault = _parcelHelpers.interopDefault(_olLayerVectorTile);
+var _olSourceOSM = require('ol/source/OSM');
+var _olSourceOSMDefault = _parcelHelpers.interopDefault(_olSourceOSM);
+var _olSourceTileWMS = require('ol/source/TileWMS');
+var _olSourceTileWMSDefault = _parcelHelpers.interopDefault(_olSourceTileWMS);
+var _olSourceXYZ = require('ol/source/XYZ');
+var _olSourceXYZDefault = _parcelHelpers.interopDefault(_olSourceXYZ);
+var _olSourceVectorTile = require('ol/source/VectorTile');
+var _olSourceVectorTileDefault = _parcelHelpers.interopDefault(_olSourceVectorTile);
+var _olStyle = require('ol/style');
+var _olProj = require('ol/proj');
+var _chromaJs = require('chroma-js');
+var _chromaJsDefault = _parcelHelpers.interopDefault(_chromaJs);
+var _olGeocoder = require('ol-geocoder');
+var _olGeocoderDefault = _parcelHelpers.interopDefault(_olGeocoder);
+// import * as olColor from 'ol/color';
+/*
+var defaultStyle = new Style({
+fill: new Fill({
+color: 'rgba(250, 250, 250, 1)'
+}),
+stroke: new Stroke({
+color: 'rgba(40, 40, 40, .9)',
+width: 1
+})
+});*/
+// a javascript object literal can be used to cache
+// previously created styles. Its very important for
+// performance to cache styles.
+var styleCache = {};
+const colorScale = _chromaJsDefault.default.scale(['red', 'orange', 'yellow', 'lime']).domain([1, 9.85]);
+// puede se bezier
+// var colorScale = chroma.scale(chroma.brewer.RdYlGn).domain([1, 9.85]);
+// var colorScale = chroma.scale( chroma.brewer.PiYG );
+// var colorScale = chroma.scale( chroma.brewer.RdYlBu );
+// var colorScale = chroma.scale( chroma.brewer.BrBG );
+// var colorScale = chroma.scale( chroma.brewer.RdBu );
+// var colorScale = chroma.scale( chroma.brewer.Spectral );
+const scales = [0, 5.735946, 6.161794, 6.458379, 6.737333, 6.929084, 7.151279, 7.372851, 7.655340, 8.134889, 10];
+// the style function returns an array of styles
+// for the given feature and resolution.
+// Return null to hide the feature.
+function icvStyle(feature, resolution) {
+  const level = feature.get('ICV2010');
+  const decile = scales.findIndex(element => element > level);
+  const ratio = (level - scales[decile - 1]) / (scales[decile] - scales[decile - 1]);
+  const colorLevel = Math.round((decile + ratio) * 10) / 10;
+  // console.log("level="+level+" decile="+decile+" ratio="+ratio+" colorLevel="+colorLevel);
+  if (!styleCache[colorLevel]) {
+    const color = _chromaJsDefault.default(colorScale(colorLevel).hex()).alpha(.6);
+    styleCache[colorLevel] = new _olStyle.Style({
+      fill: new _olStyle.Fill({
+        color: color
+      }),
+      stroke: new _olStyle.Stroke({
+        color: 'rgba(0, 0, 0, .1)',
+        width: 1
+      })
+    });
+  }
+  // console.log("level="+level+" color="+color);
+  return styleCache[colorLevel];
+}
+const urlParams = new URLSearchParams(window.location.search);
+var icvLayer;
+if (urlParams.has('raster')) {
+  icvLayer = new _olLayerTileDefault.default({
+    source: new _olSourceXYZDefault.default({
+      url: 'https://api.mapbox.com/styles/v1/azunino/ck8nrrf3611nv1jpj33wavtyq/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiYXp1bmlubyIsImEiOiJjand0czBvc24wZ2l5NDhucnc2Ym9zNXNiIn0.tAtTepUSFqApaOQygq_9iw',
+      TRANSPARENT: true
+    })
+  });
+} else {
+  icvLayer = new _olLayerVectorTileDefault.default({
+    // renderMode: "image",
+    declutter: false,
+    source: new _olSourceVectorTileDefault.default({
+      attributions: "Mapas ICV por <a href='https://igehcs.conicet.gov.ar/'>IGEHCS</a>. Desarrollo App por <a href='http://www.isistan.unicen.edu.ar/'>ISISTAN</a>. © <a href='http://www.conicet.gob.ar'>CONICET</a> & <a href='http://www.unicen.edu.ar'>UNCPBA</a>",
+      format: new _olFormatMVTDefault.default(),
+      url: 'https://icv.conicet.gov.ar/tileserver-php/icv/{z}/{x}/{y}.pbf',
+      maxZoom: 12
+    }),
+    style: icvStyle
+  });
+}
+var baseLayer;
+if (urlParams.has('basemap')) {
+  console.log(urlParams.get('basemap'));
+  if (urlParams.get('basemap') == 'ign2') {
+    baseLayer = new _olLayerTileDefault.default({
+      source: new _olSourceTileWMSDefault.default({
+        // https://wms.ign.gob.ar/geoserver/gwc/service/tms/1.0.0/capabaseargenmap@EPSG%3A3857@png/{z}/{x}/{y}.png
+        // url: 'https://wms.ign.gob.ar/geoserver/gwc/service/tms/1.0.0/capabaseargenmap@EPSG%3A3857@png/',
+        url: 'https://wms.ign.gob.ar/geoserver/gwc/service/wms',
+        params: {
+          'LAYERS': 'capabaseargenmap',
+          'TILED': true,
+          'srs': 'EPSG:3857'
+        },
+        serverType: 'geoserver',
+        // Countries have transparency, so do not fade tiles:
+        transition: 0
+      })
+    });
+  } else if (urlParams.get('basemap') == 'ign') {
+    baseLayer = new _olLayerTileDefault.default({
+      source: new _olSourceXYZDefault.default({
+        attributions: 'Tiles © <a href="https://services.arcgisonline.com/ArcGIS/' + 'rest/services/Canvas/World_Light_Gray_Base/MapServer">ArcGIS</a>',
+        url: 'https://wms.ign.gob.ar/geoserver/gwc/service/tms/1.0.0/capabaseargenmap@EPSG%3A3857@png/{z}/{x}/{-y}.png'
+      })
+    });
+  } else if (urlParams.get('basemap') == 'osm') {
+    baseLayer = new _olLayerTileDefault.default({
+      source: new _olSourceOSMDefault.default()
+    });
+  }
+} else {
+  console.log('default basemap esri');
+  baseLayer = new _olLayerTileDefault.default({
+    source: new _olSourceXYZDefault.default({
+      attributions: 'Tiles © <a href="https://services.arcgisonline.com/ArcGIS/' + 'rest/services/Canvas/World_Light_Gray_Base/MapServer">ArcGIS</a>',
+      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/' + 'Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}'
+    })
+  });
+}
+var map = new _olMapDefault.default({
+  target: 'map',
+  layers: [baseLayer, icvLayer],
+  view: new _olViewDefault.default({
+    zoomFactor: 1.4,
+    // extent: transformExtent([-53.6374515,-21.781168,-73.5605371,-55.1850761], 'EPSG:4326', 'EPSG:3857'),
+    center: _olProj.fromLonLat([-64.9672817, -34.9964963]),
+    zoom: 4
+  })
+});
+// tileloadend
+// rendercomplete
+// icvLayer.getSource().on('tileloadend', function() {
+/*
+map.on('rendercomplete', function() {
+console.log('rendercomplete');
+});
+*/
+map.getView().fit(_olProj.transformExtent([-53.6374515, -21.781168, -73.5605371, -55.1850761], 'EPSG:4326', 'EPSG:3857'), map.getSize());
+var provider = locationIQSearch({
+  url: 'https://us1.locationiq.com/v1/search.php?format=json&key=0e7dd68b4a8a12&accept-language=es&no_annotations=0&countrycodes=AR'
+});
+var gc = new _olGeocoderDefault.default('nominatim', {
+  provider: provider,
+  // key: '__some_key__',
+  lang: 'es',
+  // en-US, fr-FR
+  placeholder: 'Buscar ...',
+  // targetType: 'text-input',
+  limit: 5,
+  countrycodes: 'ar',
+  autoComplete: true,
+  autoCompleteMinLength: 5,
+  keepOpen: true
+});
+const locationParentElement = document.getElementById('location').parentNode;
+const animSearch = new URLSearchParams(window.location.search).has('anim') ? 1 : 0;
+gc.on('addresschosen', function (evt) {
+  console.log(evt.address.details.name);
+  var element = document.getElementById('location');
+  if (element != null) element.parentNode.removeChild(element);
+  if (evt.bbox) {
+    console.log("bbox: " + JSON.stringify(evt.bbox));
+    // map.getView().fit(transformExtent([-53.6374515, -21.781168, -73.5605371, -55.1850761], 'EPSG:4326', 'EPSG:3857'), map.getSize());
+    if (animSearch) {
+      map.getView().fit(evt.bbox, {
+        duration: 3000
+      });
+    } else {
+      map.getView().fit(evt.bbox);
+    }
+    map.once('rendercomplete', function () {
+      console.log('rendercomplete');
+      const newElement = document.createElement("div");
+      newElement.setAttribute('id', 'location');
+      newElement.style.display = "none";
+      locationParentElement.appendChild(newElement);
+      document.title = evt.address.details.name;
+    });
+    setTimeout(function () {
+      map.renderSync();
+    }, 3000);
+  } else {
+    map.getView().animate({
+      zoom: 14,
+      center: evt.coordinate
+    });
+  }
+});
+// esto rompe todo con puppeteer en móviles. Ni idea por qué
+// map.once('rendercomplete', function () {
+map.addControl(gc);
+// });
+// map.renderSync();
+function locationIQSearch(options) {
+  var url = options.url;
+  return {
+    /**
+    * Get the url, query string parameters and optional JSONP callback
+    * name to be used to perform a search.
+    * @param {object} options Options object with query, key, lang,
+    * countrycodes and limit properties.
+    * @return {object} Parameters for search request
+    */
+    getParameters: function (opt) {
+      return {
+        url: url,
+        // callbackName: 'json_callback',
+        params: {
+          q: opt.query
+        }
+      };
+    },
+    /**
+    * Given the results of performing a search return an array of results
+    * @param {object} data returned following a search request
+    * @return {Array} Array of search results
+    */
+    handleResponse: function (results) {
+      // The API returns a GeoJSON FeatureCollection
+      if (!results.length) return;
+      // console.log("response: "+results);
+      return results.map(result => ({
+        lon: result.lon,
+        lat: result.lat,
+        address: {
+          // Simply return a name in this case, could also return road,
+          // building, house_number, city, town, village, state,
+          // country
+          name: result.display_name
+        },
+        // bbox: [result.boundingbox[2], result.boundingbox[0], result.boundingbox[3], result.boundingbox[1]],
+        bbox: result.boundingbox
+      }));
+    }
+  };
+}

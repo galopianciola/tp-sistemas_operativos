@@ -1,0 +1,180 @@
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "create", function () {
+  return create;
+});
+_parcelHelpers.export(exports, "reset", function () {
+  return reset;
+});
+_parcelHelpers.export(exports, "multiply", function () {
+  return multiply;
+});
+_parcelHelpers.export(exports, "set", function () {
+  return set;
+});
+_parcelHelpers.export(exports, "setFromArray", function () {
+  return setFromArray;
+});
+_parcelHelpers.export(exports, "apply", function () {
+  return apply;
+});
+_parcelHelpers.export(exports, "rotate", function () {
+  return rotate;
+});
+_parcelHelpers.export(exports, "scale", function () {
+  return scale;
+});
+_parcelHelpers.export(exports, "makeScale", function () {
+  return makeScale;
+});
+_parcelHelpers.export(exports, "translate", function () {
+  return translate;
+});
+_parcelHelpers.export(exports, "compose", function () {
+  return compose;
+});
+_parcelHelpers.export(exports, "composeCssTransform", function () {
+  return composeCssTransform;
+});
+_parcelHelpers.export(exports, "invert", function () {
+  return invert;
+});
+_parcelHelpers.export(exports, "makeInverse", function () {
+  return makeInverse;
+});
+_parcelHelpers.export(exports, "determinant", function () {
+  return determinant;
+});
+_parcelHelpers.export(exports, "toString", function () {
+  return toString;
+});
+var _assertsJs = require('./asserts.js');
+/**
+* An array representing an affine 2d transformation for use with
+* {@link module:ol/transform} functions. The array has 6 elements.
+* @typedef {!Array<number>} Transform
+* @api
+*/
+/**
+* Collection of affine 2d transformation functions. The functions work on an
+* array of 6 elements. The element order is compatible with the [SVGMatrix
+* interface](https://developer.mozilla.org/en-US/docs/Web/API/SVGMatrix) and is
+* a subset (elements a to f) of a 3×3 matrix:
+* ```
+* [ a c e ]
+* [ b d f ]
+* [ 0 0 1 ]
+* ```
+*/
+/**
+* @private
+* @type {Transform}
+*/
+var tmp_ = new Array(6);
+function create() {
+  return [1, 0, 0, 1, 0, 0];
+}
+function reset(transform) {
+  return set(transform, 1, 0, 0, 1, 0, 0);
+}
+function multiply(transform1, transform2) {
+  var a1 = transform1[0];
+  var b1 = transform1[1];
+  var c1 = transform1[2];
+  var d1 = transform1[3];
+  var e1 = transform1[4];
+  var f1 = transform1[5];
+  var a2 = transform2[0];
+  var b2 = transform2[1];
+  var c2 = transform2[2];
+  var d2 = transform2[3];
+  var e2 = transform2[4];
+  var f2 = transform2[5];
+  transform1[0] = a1 * a2 + c1 * b2;
+  transform1[1] = b1 * a2 + d1 * b2;
+  transform1[2] = a1 * c2 + c1 * d2;
+  transform1[3] = b1 * c2 + d1 * d2;
+  transform1[4] = a1 * e2 + c1 * f2 + e1;
+  transform1[5] = b1 * e2 + d1 * f2 + f1;
+  return transform1;
+}
+function set(transform, a, b, c, d, e, f) {
+  transform[0] = a;
+  transform[1] = b;
+  transform[2] = c;
+  transform[3] = d;
+  transform[4] = e;
+  transform[5] = f;
+  return transform;
+}
+function setFromArray(transform1, transform2) {
+  transform1[0] = transform2[0];
+  transform1[1] = transform2[1];
+  transform1[2] = transform2[2];
+  transform1[3] = transform2[3];
+  transform1[4] = transform2[4];
+  transform1[5] = transform2[5];
+  return transform1;
+}
+function apply(transform, coordinate) {
+  var x = coordinate[0];
+  var y = coordinate[1];
+  coordinate[0] = transform[0] * x + transform[2] * y + transform[4];
+  coordinate[1] = transform[1] * x + transform[3] * y + transform[5];
+  return coordinate;
+}
+function rotate(transform, angle) {
+  var cos = Math.cos(angle);
+  var sin = Math.sin(angle);
+  return multiply(transform, set(tmp_, cos, sin, -sin, cos, 0, 0));
+}
+function scale(transform, x, y) {
+  return multiply(transform, set(tmp_, x, 0, 0, y, 0, 0));
+}
+function makeScale(target, x, y) {
+  return set(target, x, 0, 0, y, 0, 0);
+}
+function translate(transform, dx, dy) {
+  return multiply(transform, set(tmp_, 1, 0, 0, 1, dx, dy));
+}
+function compose(transform, dx1, dy1, sx, sy, angle, dx2, dy2) {
+  var sin = Math.sin(angle);
+  var cos = Math.cos(angle);
+  transform[0] = sx * cos;
+  transform[1] = sy * sin;
+  transform[2] = -sx * sin;
+  transform[3] = sy * cos;
+  transform[4] = dx2 * sx * cos - dy2 * sx * sin + dx1;
+  transform[5] = dx2 * sy * sin + dy2 * sy * cos + dy1;
+  return transform;
+}
+function composeCssTransform(dx1, dy1, sx, sy, angle, dx2, dy2) {
+  return toString(compose(create(), dx1, dy1, sx, sy, angle, dx2, dy2));
+}
+function invert(source) {
+  return makeInverse(source, source);
+}
+function makeInverse(target, source) {
+  var det = determinant(source);
+  _assertsJs.assert(det !== 0, 32);
+  // Transformation matrix cannot be inverted
+  var a = source[0];
+  var b = source[1];
+  var c = source[2];
+  var d = source[3];
+  var e = source[4];
+  var f = source[5];
+  target[0] = d / det;
+  target[1] = -b / det;
+  target[2] = -c / det;
+  target[3] = a / det;
+  target[4] = (c * f - d * e) / det;
+  target[5] = -(a * f - b * e) / det;
+  return target;
+}
+function determinant(mat) {
+  return mat[0] * mat[3] - mat[1] * mat[2];
+}
+function toString(mat) {
+  return 'matrix(' + mat.join(', ') + ')';
+}

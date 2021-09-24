@@ -1,0 +1,13 @@
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "asColorLike", function () {
+  return asColorLike;
+});
+var _colorJs = require('./color.js');
+function asColorLike(color) {
+  if (Array.isArray(color)) {
+    return _colorJs.toString(color);
+  } else {
+    return color;
+  }
+}

@@ -1,0 +1,13 @@
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "DEFAULT_WMS_VERSION", function () {
+  return DEFAULT_WMS_VERSION;
+});
+_parcelHelpers.export(exports, "IMAGE_SMOOTHING_DISABLED", function () {
+  return IMAGE_SMOOTHING_DISABLED;
+});
+var DEFAULT_WMS_VERSION = '1.3.0';
+var IMAGE_SMOOTHING_DISABLED = {
+  imageSmoothingEnabled: false,
+  msImageSmoothingEnabled: false
+};

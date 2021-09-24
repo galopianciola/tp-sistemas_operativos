@@ -1,0 +1,17 @@
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+_parcelHelpers.export(exports, "linearRingss", function () {
+  return linearRingss;
+});
+var _extentJs = require('../../extent.js');
+function linearRingss(flatCoordinates, offset, endss, stride) {
+  var flatCenters = [];
+  var extent = _extentJs.createEmpty();
+  for (var i = 0, ii = endss.length; i < ii; ++i) {
+    var ends = endss[i];
+    extent = _extentJs.createOrUpdateFromFlatCoordinates(flatCoordinates, offset, ends[0], stride);
+    flatCenters.push((extent[0] + extent[2]) / 2, (extent[1] + extent[3]) / 2);
+    offset = ends[ends.length - 1];
+  }
+  return flatCenters;
+}

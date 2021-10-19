@@ -23,24 +23,29 @@ app.listen(port, () => {
     console.log(`listening on port ${port}`)
 });
 
-app.get('/', requiresAuth(), (req, res) => {
-    let htmlPath = path.resolve(__dirname, 'index.html')
-    res.send(req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out')
-    if (req.oidc.isAuthenticated()) {
-        res.sendFile(htmlPath)
-    } else {
-        res.send('ASHE')
-    }
+app.get('/', (req, res) => {
+    res.send('hola')
 })
 
 app.get('/map', requiresAuth(), (req, res) => {
-    //let htmlPath = path.resolve(__dirname, 'index.html')
-    //res.sendFile(htmlPath);
+    let htmlPath = path.resolve(__dirname, 'dist/index.html')
+    //res.send(req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out')
+    // if (req.oidc.isAuthenticated()) {
+    //     res.sendFile(htmlPath)
+    // } else {
+    //     res.send('ASHE')
+    // }
+    res.sendFile(htmlPath);
 })
+
+// app.get('/map', requiresAuth(), (req, res) => {
+//     //let htmlPath = path.resolve(__dirname, 'index.html')
+//     //res.sendFile(htmlPath);
+// })
 
 
 app.get('/profile', requiresAuth(), (req, res) => {
-    //res.send(JSON.stringify(req.oidc.user))
+    res.send(JSON.stringify(req.oidc.user))
     //let htmlPath = path.resolve(__dirname, 'index.html')
     //res.sendFile(htmlPath);
 })

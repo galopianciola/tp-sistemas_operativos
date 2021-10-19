@@ -16,7 +16,7 @@ app.use(
   })
 );
 
-//app.use(express.static('dist'));
+app.use(express.static('dist'));
 
 const port = process.env.PORT || 3001
 app.listen(port, () => {
@@ -25,7 +25,7 @@ app.listen(port, () => {
 
 app.get('/', requiresAuth(), (req, res) => {
     let htmlPath = path.resolve(__dirname, 'index.html')
-    //res.send(req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out')
+    res.send(req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out')
     if (req.oidc.isAuthenticated()) {
         res.sendFile(htmlPath)
     } else {

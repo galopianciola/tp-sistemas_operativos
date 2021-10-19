@@ -23,12 +23,12 @@ app.listen(port, () => {
     console.log(`listening on port ${port}`)
 });
 
-app.get('/', (req, res) => {
-    res.send('hola')
-})
+// app.get('/', (req, res) => {
+//     res.send('hola')
+// })
 
-app.get('/map', requiresAuth(), (req, res) => {
-    let htmlPath = path.resolve(__dirname, 'dist/index.html')
+app.get('/', requiresAuth(), (req, res) => {
+    let htmlPath = path.resolve(__dirname, 'dist/map.html')
     //res.send(req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out')
     // if (req.oidc.isAuthenticated()) {
     //     res.sendFile(htmlPath)

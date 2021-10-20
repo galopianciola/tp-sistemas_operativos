@@ -4,8 +4,8 @@
     "description": "ICV with OpenLayers",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "start": "parcel serve ./src/map.html",
-        "build": "parcel build ./src/map.html"
+        "start": "parcel serve ./src/map.html ./src/profile.html",
+        "build": "parcel build ./src/map.html ./src/profile.html"
     },
     "engines": {
         "node": ">= 14.0.0"

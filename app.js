@@ -27,6 +27,12 @@ app.listen(port, () => {
 //     res.send('hola')
 // })
 
+app.get('/get-user-data', requiresAuth(), (req, res) => {
+  res.send(JSON.stringify(req.oidc.user))
+  //let htmlPath = path.resolve(__dirname, 'index.html')
+  //res.sendFile(htmlPath);
+})
+
 app.get('/', requiresAuth(), (req, res) => {
     let htmlPath = path.resolve(__dirname, 'dist/map.html')
     //res.send(req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out')
@@ -45,10 +51,12 @@ app.get('/', requiresAuth(), (req, res) => {
 
 
 app.get('/profile', requiresAuth(), (req, res) => {
-    res.send(JSON.stringify(req.oidc.user))
-    //let htmlPath = path.resolve(__dirname, 'index.html')
-    //res.sendFile(htmlPath);
+    //res.send(JSON.stringify(req.oidc.user))
+    let htmlPath = path.resolve(__dirname, 'dist/profile.html')
+    res.sendFile(htmlPath);
 })
+
+
 
 // document.getElementById('nameLogin').value = 'AGUSTIN'
 

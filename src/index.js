@@ -269,7 +269,7 @@ function locationIQSearch(options) {
 
 window.addEventListener('load', (event) => {
     // console.log('The page has fully loaded');
-    fetch('/profile') 
+    fetch('/get-user-data') 
   .then(response => response.json())
   .then(data => {
       console.log(data);

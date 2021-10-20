@@ -49,12 +49,19 @@
     <img id="profile-photo" src="https://www.w3schools.com/howto/img_avatar.png" alt="Avatar">
     <h1 id="user-name-surname">Agustin Schilling</h1>
     <h4 id="user-nickname">@agusschilling</h1>
-    <p class="lead" id="email">agusschilling@gmail.com</p>
   </main>
+  <div class="email-container">
+    <p class="lead" id="user-email">agusschilling@gmail.com</p>
+  </div>
 
   <div class="buttons-container">
     <a href="#" class="btn btn-lg btn-secondary fw-bold border-white bg-white"><i class="fas fa-map-marked-alt"></i>&nbspVolver al mapa</a>
-    <a href="#" class="btn btn-lg btn-primary fw-bold border-grey bg-grey"><i class="fas fa-sign-out-alt"></i>&nbspCerrar sesión</a>
+
+    <form action="/logout" class="form-inline">
+      <div class="">
+        <button type="submit" class="btn btn-lg btn-primary fw-bold border-grey bg-grey"><i class="fas fa-sign-out-alt"></i>&nbspCerrar sesión</a>
+      </div>
+    </form>
   </div>
 
   <footer class="mt-auto text-white-50">

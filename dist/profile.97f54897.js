@@ -1,0 +1,2 @@
+window.addEventListener("load",(e=>{fetch("/get-user-data").then((e=>e.json())).then((e=>{console.log(e),console.log(e.email),document.getElementById("profile-photo").src=e.picture,document.getElementById("user-name-surname").innerHTML=e.name,document.getElementById("user-nickname").innerHTML="@"+e.nickname,document.getElementById("user-email").innerText=e.email}))}));
+//# sourceMappingURL=profile.97f54897.js.map

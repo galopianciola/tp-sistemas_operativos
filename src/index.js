@@ -274,7 +274,7 @@ window.addEventListener('load', (event) => {
   .then(data => {
       console.log(data);
       console.log(document.getElementById('nameLogin'));
-      document.getElementById('nameLogin').text = 'Welcome ' + data.name;
+      document.getElementById('nameLogin').text = 'Bienvenido ' + data.given_name + '!';
       document.getElementById('imgLogin').src = data.picture;
   });
 });

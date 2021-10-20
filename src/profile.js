@@ -5,10 +5,10 @@ window.addEventListener('load', (event) => {
   .then(response => response.json())
   .then(data => {
       console.log(data);
-      console.log(document.getElementById('nameLogin'));
+      console.log(data.email);
       document.getElementById('profile-photo').src = data.picture;
       document.getElementById('user-name-surname').innerHTML = data.name;
-      document.getElementById('user-nickname').innerHTML = data.nickname;
-      document.getElementById('email').innerHTML = data.email;
+      document.getElementById('user-nickname').innerHTML = '@' + data.nickname;
+      document.getElementById('user-email').innerText = data.email;
   });
 });

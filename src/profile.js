@@ -1,4 +1,8 @@
 
+document.getElementById("back-to-map").onclick = function () {
+  window.location.href = "/";
+};
+
 window.addEventListener('load', (event) => {
     // console.log('The page has fully loaded');
     fetch('/get-user-data') 

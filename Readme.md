@@ -2,5 +2,5 @@
 
 # npm run-script build
 
-# npm start
+# node app.js
 

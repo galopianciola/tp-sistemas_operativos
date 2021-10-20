@@ -49,3 +49,6 @@ app.get('/profile', requiresAuth(), (req, res) => {
     //let htmlPath = path.resolve(__dirname, 'index.html')
     //res.sendFile(htmlPath);
 })
+
+// document.getElementById('nameLogin').value = 'AGUSTIN'
+

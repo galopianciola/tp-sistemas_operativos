@@ -266,3 +266,15 @@ function locationIQSearch(options) {
         }
     }
 }
+
+window.addEventListener('load', (event) => {
+    // console.log('The page has fully loaded');
+    fetch('/profile') 
+  .then(response => response.json())
+  .then(data => {
+      console.log(data);
+      console.log(document.getElementById('nameLogin'));
+      document.getElementById('nameLogin').text = 'Welcome ' + data.name;
+      document.getElementById('imgLogin').src = data.picture;
+  });
+});

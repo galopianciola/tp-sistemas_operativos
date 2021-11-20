@@ -23,40 +23,17 @@ app.listen(port, () => {
     console.log(`listening on port ${port}`)
 });
 
-// app.get('/', (req, res) => {
-//     res.send('hola')
-// })
-
 app.get('/get-user-data', requiresAuth(), (req, res) => {
   res.send(JSON.stringify(req.oidc.user))
-  //let htmlPath = path.resolve(__dirname, 'index.html')
-  //res.sendFile(htmlPath);
 })
 
 app.get('/', requiresAuth(), (req, res) => {
     let htmlPath = path.resolve(__dirname, 'dist/map.html')
-    //res.send(req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out')
-    // if (req.oidc.isAuthenticated()) {
-    //     res.sendFile(htmlPath)
-    // } else {
-    //     res.send('ASHE')
-    // }
     res.sendFile(htmlPath);
 })
 
-// app.get('/map', requiresAuth(), (req, res) => {
-//     //let htmlPath = path.resolve(__dirname, 'index.html')
-//     //res.sendFile(htmlPath);
-// })
-
-
 app.get('/profile', requiresAuth(), (req, res) => {
-    //res.send(JSON.stringify(req.oidc.user))
     let htmlPath = path.resolve(__dirname, 'dist/profile.html')
     res.sendFile(htmlPath);
 })
-
-
-
-// document.getElementById('nameLogin').value = 'AGUSTIN'
 
